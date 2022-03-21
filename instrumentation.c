@@ -1,4 +1,4 @@
-#include "stdlib.c"
+#include "e9patch/examples/stdlib.c"
 
 /*
  * The counter.
