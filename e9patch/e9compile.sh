@@ -56,7 +56,7 @@ echo "$COMPILE" | xargs
 if ! eval "$COMPILE"
 then
     echo >&2
-    echo "${RED}error${OFF}: compilation of (${YELLOW}$BASENAME${OFF}) failed" >&2
+    echo "${RED}error${OFF}: compilation of (${YELLOW}$BASENAME.out${OFF}) failed" >&2
     echo >&2
     exit 1
 fi
@@ -68,22 +68,22 @@ CFLAGS="-pie -nostdlib \
     -Wl,--export-dynamic \
     -Wl,--entry=0x0 \
     -Wl,--strip-all"
-COMPILE="$CC \"$BASENAME.o\" -o \"$BASENAME\" $CFLAGS"
+COMPILE="$CC \"$BASENAME.o\" -o \"$BASENAME.out\" $CFLAGS"
 
 echo "$COMPILE" | xargs
 if ! eval "$COMPILE"
 then
     echo >&2
-    echo "${RED}error${OFF}: linking (${YELLOW}$BASENAME${OFF}) failed" >&2
+    echo "${RED}error${OFF}: linking (${YELLOW}$BASENAME.out${OFF}) failed" >&2
     echo >&2
     exit 1
 fi
 
-RELOCS=`readelf -r "$BASENAME" | head -n 10 | grep 'R_X86_64_'`
+RELOCS=`readelf -r "$BASENAME.out" | head -n 10 | grep 'R_X86_64_'`
 if [ ! -z "$RELOCS" ]
 then
     echo >&2
-    echo "${RED}error${OFF}: the generated file (${YELLOW}$BASENAME${OFF}) contains relocations" >&2
+    echo "${RED}error${OFF}: the generated file (${YELLOW}$BASENAME.out${OFF}) contains relocations" >&2
     echo >&2
     echo "EXPLANATION:" >&2
     echo >&2
