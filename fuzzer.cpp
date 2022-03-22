@@ -2,12 +2,15 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <vector>
+#include <sstream>
 
 int main(int argc, char* argv[])
 {
     int fd;
     char myfifo [] = "myfifo";
-    char buf[10][12];
+    char buf[8]; // void* buf = ::operator new(sizeof(char) * 8);
+    std::vector<std::string> data; //std::vector<void*> data;
 
     if(mkfifo(myfifo, 0777) == -1){
         printf("pipe sa neotvorila");
@@ -30,11 +33,19 @@ int main(int argc, char* argv[])
             //parent
 
             fd = open(myfifo, O_RDONLY);
-            read(fd, buf, sizeof(char) * 120);
-            int length = sizeof(buf)/sizeof(buf[0][0]);
-            for(int i = 0; i < length; i += 8){
-                printf("recieved: %p length: %d\n", *(buf+i), length);
+            while(read(fd, buf, sizeof(char) * 8)){
+                data.push_back(buf);
+                //buf = ::operator new(sizeof(char) * 8);
             }
+
+            for(std::string address: data){
+                printf("j.* : %p\n", address);
+            }
+
+            //for(void* address: data){
+            //    printf("j.* : %p\n", address);
+            //}
+
             close(fd);   
         }
     }
