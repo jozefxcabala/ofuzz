@@ -9,8 +9,7 @@ int main(int argc, char* argv[])
 {
     int fd;
     char myfifo [] = "myfifo";
-    char buf[8]; // void* buf = ::operator new(sizeof(char) * 8);
-    std::vector<std::string> data; //std::vector<void*> data;
+    std::vector<uint64_t> data;
 
     if(mkfifo(myfifo, 0777) == -1){
         printf("pipe sa neotvorila");
@@ -32,19 +31,12 @@ int main(int argc, char* argv[])
         {
             //parent
 
+            uint64_t address{0};
             fd = open(myfifo, O_RDONLY);
-            while(read(fd, buf, sizeof(char) * 8)){
-                data.push_back(buf);
-                //buf = ::operator new(sizeof(char) * 8);
+            while(read(fd, &address, sizeof(uint64_t))){
+                std::cout << address << std::endl;
+                data.push_back(address);
             }
-
-            for(std::string address: data){
-                printf("j.* : %p\n", address);
-            }
-
-            //for(void* address: data){
-            //    printf("j.* : %p\n", address);
-            //}
 
             close(fd);   
         }

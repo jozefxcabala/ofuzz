@@ -8,7 +8,7 @@ char myfifo [] = "myfifo";
 
 void entry(const void * addr)
 {   
-    write(fd, addr, sizeof(char) * 8);
+    write(fd, (uint64_t)&addr, sizeof(uint64_t));
 }
 
 /*
