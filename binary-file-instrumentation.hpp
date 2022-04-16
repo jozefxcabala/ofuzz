@@ -20,6 +20,7 @@ class BinaryFileInstrumentation
 
         std::vector<uint64_t> data();
         int saveOut();
+        void printData();
 
     private:
         bool createMyFifo();

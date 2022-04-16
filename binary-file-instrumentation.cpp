@@ -6,10 +6,10 @@
 #include <sys/stat.h>
 #include <sstream>
 #include <sys/wait.h>
+#include <stdio.h>
 
 BinaryFileInstrumentation::BinaryFileInstrumentation()
 {
-    std::cout << "BinaryFileInstrumentation was created!" << std::endl;
 }
 
 void BinaryFileInstrumentation::setData(std::vector<uint64_t> data)
@@ -35,8 +35,8 @@ int BinaryFileInstrumentation::saveOut()
 bool BinaryFileInstrumentation::createMyFifo()
 {    
     if(mkfifo("myfifo", 0777) == -1){
-        std::cerr << "The pipe did not open properly" << std::endl;
-        return false;
+        perror("The following mkfifo(""myfifo"", 0777) error occurred");
+        exit(EXIT_FAILURE);
     }
 
     return true;
@@ -48,28 +48,28 @@ bool BinaryFileInstrumentation::runE9PatchTool()
     {
         case -1:
         {
-            std::cerr << "The fork did not work properly" << std::endl;
-            return false;
+            perror("The following fork() error occurred");
+            exit(EXIT_FAILURE);
         }
         case 0:
         {
-            //child - TODO osetri execl
-            execl("./e9patch/e9tool", "./e9patch/e9tool", "-M", "asm=/j.*/", "-P", "entry(addr)@instrumentation.out", "example.out", (char*) NULL);
+            //child
+            if(execl("./e9patch/e9tool", "./e9patch/e9tool", "-M", "asm=/j.*/", "-P", "entry(addr)@instrumentation.out", "example.out", (char*) NULL) == -1)
+            {
+                perror("The following (""./e9patch/e9tool"", ""./e9patch/e9tool"", ""-M"", ""asm=/j.*/"", ""-P"", ""entry(addr)@instrumentation.out"", ""example.out"", (char*) NULL) error occurred");
+                exit(EXIT_FAILURE);
+            }
         }
         default:
         {
             //parent
-            wait(NULL);
-
-            if(runInstrumentedBinaryFile())
+            if(wait(NULL) == -1)
             {
-                return true;
-            } 
-            else 
-            {
-                std::cerr << "runInstrumentedBinaryFile did not work properly" << std::endl;
-                return false;
+                perror("The following wait(NULL) error occurred");
+                exit(EXIT_FAILURE);
             }
+
+            runInstrumentedBinaryFile();
         }
     }
 
@@ -81,20 +81,17 @@ bool BinaryFileInstrumentation::runInstrumentedBinaryFile()
     switch(fork()){
         case -1:
         {
-            std::cerr << "The fork did not work properly" << std::endl;
-            return false;
+            perror("The following fork() error occurred");
+            exit(EXIT_FAILURE);
         }
         case 0:
         {
-            if(redirectSTDOut())
-            {
+            redirectSTDOut();
 
-                execl("./a.out", "./a.out", (char*) NULL);
-            } 
-            else 
+            if(execl("./a.out", "./a.out", (char*) NULL) == -1)
             {
-                std::cerr << "redirectSTDOut did not work properly" << std::endl;
-                return false;
+                perror("Error in execl(""./a.out"", ""./a.out"", (char*) NULL) occurred");
+                exit(EXIT_FAILURE);
             }
         }
         default:
@@ -112,22 +109,22 @@ bool BinaryFileInstrumentation::redirectSTDOut()
     setSaveOut(dup(STDOUT_FILENO));
     if(saveOut() == -1)
     {
-        std::cerr << "Error in dup(STDOUT_FILENO)" << std::endl;
-        return false;
+        perror("Error in dup(STDOUT_FILENO) occurred");
+        exit(EXIT_FAILURE);
     }
 
     int devNull = open("/dev/null", O_WRONLY);
     if(devNull == -1)
     {
-        std::cerr << "Error in open('/dev/null',0)" << std::endl;
-        return false;
+        perror("Error in open('/dev/null',0) occurred");
+        exit(EXIT_FAILURE);
     }
 
     int dup2Result = dup2(devNull, STDOUT_FILENO);
     if(dup2Result == -1)
     {
-        std::cerr << "Error in dup2(devNull, STDOUT_FILENO)" << std::endl;
-        return false;
+        perror("Error in dup2(devNull, STDOUT_FILENO) occurred");
+        exit(EXIT_FAILURE);
     }
 
     return true;
@@ -139,33 +136,52 @@ std::vector<uint64_t> BinaryFileInstrumentation::saveTheReachedBlocks()
     uint64_t address{0};
 
     int fD = open("myfifo", O_RDONLY);
+
+    if(fD == -1)
+    {
+        perror("Error in open(""myfifo"", O_RDONLY) occurred");
+        exit(EXIT_FAILURE);
+    }
+
     while(read(fD, &address, sizeof(uint64_t)))
     {
         result.push_back(address);
     }
 
-    close(fD);
-    closeMyFifo();
+    if(close(fD) == -1)
+    {
+        perror("Error in close(fD) occurred");
+        exit(EXIT_FAILURE);
+    }
+
+    //closeMyFifo();
 
     return result;
 }
 
 bool BinaryFileInstrumentation::closeMyFifo()
 {
-    unlink("myfifo");
+    if(unlink("myfifo") == -1)
+    {
+        perror("Error in unlink(""myfifo"") occurred");
+        exit(EXIT_FAILURE);
+    }
+
     return true;
 }
 
 bool BinaryFileInstrumentation::start()
 {
     createMyFifo();
-    if(runE9PatchTool())
+    runE9PatchTool();
+
+    return true;
+}
+
+void BinaryFileInstrumentation::printData()
+{
+    for (uint64_t d : data())
     {
-        return true;
-    } 
-    else 
-    {
-        std::cout << "runE9PatchTool did not work properly" << std::endl;
-        return false;
+        std::cout << d << std::endl;
     }
 }

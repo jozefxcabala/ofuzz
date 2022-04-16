@@ -4,8 +4,8 @@
 int main()
 {
     BinaryFileInstrumentation binaryFileInstrumentation;
-    std::cout << binaryFileInstrumentation.start() << std::endl;
-
-    
+    binaryFileInstrumentation.start();
+    binaryFileInstrumentation.printData();
+ 
     return 0;
 }
