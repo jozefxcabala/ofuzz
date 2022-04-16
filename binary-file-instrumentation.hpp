@@ -15,11 +15,9 @@ class BinaryFileInstrumentation
         BinaryFileInstrumentation();
         bool start();
 
-        void setMyFifo(std::string myFifo);
         void setData(std::vector<uint64_t> data);
         void setSaveOut(int saveOut);
 
-        std::string myFifo();
         std::vector<uint64_t> data();
         int saveOut();
 
