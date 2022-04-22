@@ -1,6 +1,5 @@
 #include "code-coverage.hpp"
-#include "vector"
-#include "cstdint"
+
 #include "string"
 
 #ifndef SAMPLE_H
