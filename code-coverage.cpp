@@ -48,7 +48,7 @@ int CodeCoverage::getNumberOfBlocks()
     return data().size();
 }
 
-int CodeCoverage::calculateCoverage()
+void CodeCoverage::calculateCoverage()
 {
     createMyFifo();
     wait(NULL);

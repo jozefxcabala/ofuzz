@@ -28,8 +28,8 @@ class CodeCoverage
         void redirectSTDOut();
         void runInstrumentedBinaryFile();
         void closeMyFifo();
-        std::vector<uint64_t> saveTheReachedBlocks();
-        int calculateCoverage();     
+        void calculateCoverage();    
+        std::vector<uint64_t> saveTheReachedBlocks(); 
         int getNumberOfBlocks();   
 };
 
