@@ -14,12 +14,12 @@ void Sample::setCodeCoverage(CodeCoverage codeCoverage)
     codeCoverage_ = codeCoverage;
 }
 
-void Sample::data()
+std::string Sample::data()
 {
     return data_;
 }
 
-void Sample::codeCoverage()
+CodeCoverage Sample::codeCoverage()
 {
     return codeCoverage_;
 }
