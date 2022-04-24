@@ -3,9 +3,29 @@
 #include <fstream>
 #include <iostream>
 
+std::string SampleProcessing::dirForMutatedFiles()
+{
+	return difForMutatedFiles_;
+}
+
+void SampleProcessing::setDirForMutatedFiles(std::string dirForMutatedFiles)
+{
+	difForMutatedFiles_ = dirForMutatedFiles;
+}
+
+SampleProcessing::SampleProcessing()
+{
+
+}
+
+SampleProcessing::SampleProcessing(std::string dirForMutatedFiles)
+{
+	setDirForMutatedFiles(dirForMutatedFiles);
+}
+
 void SampleProcessing::createNew(std::string mutated, std::string fileName)
 {
-	std::ofstream fout(fileName, std::ios::binary);
+	std::ofstream fout(dirForMutatedFiles() + "/" + fileName, std::ios::binary);
 
 	if (fout.is_open())
 	{
@@ -14,7 +34,7 @@ void SampleProcessing::createNew(std::string mutated, std::string fileName)
 	}
 	else
 	{
-		std::cout << "Failed to create: " << fileName << std::endl; //TODO podla toho ako to mam inde
+		std::cout << "Failed to create: " << (dirForMutatedFiles() + "/" + fileName) << std::endl; //TODO podla toho ako to mam inde
 		exit(1);
 	}
 
@@ -22,7 +42,7 @@ void SampleProcessing::createNew(std::string mutated, std::string fileName)
 
 std::string SampleProcessing::getBytes(std::string fileName)
 {
-	std::ifstream fin(fileName, std::ios::binary);
+	std::ifstream fin(dirForMutatedFiles() + "/" + fileName, std::ios::binary);
 
 	if (fin.is_open())
 	{
@@ -37,7 +57,7 @@ std::string SampleProcessing::getBytes(std::string fileName)
 
 	else
 	{
-		std::cout << "Failed to open " << fileName << ".\n";
+		std::cout << "Failed to open " << dirForMutatedFiles() + "/" + fileName << ".\n";
 		exit(1);
 	}
 
