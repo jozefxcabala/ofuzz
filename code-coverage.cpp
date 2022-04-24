@@ -14,6 +14,21 @@ CodeCoverage::CodeCoverage()
 
 }
 
+CodeCoverage::CodeCoverage(std::string inputFile)
+{
+    setInputFile(inputFile);
+}
+
+void CodeCoverage::setInputFile(std::string inputFile)
+{
+    inputFile_ = inputFile;
+}
+
+std::string CodeCoverage::inputFile()
+{
+    return inputFile_;
+}
+
 void CodeCoverage::setData(std::vector<uint64_t> data)
 {
     data_ = data;
@@ -69,9 +84,9 @@ void CodeCoverage::runInstrumentedBinaryFile()
         {
             redirectSTDOut();
 
-            if(execl("./a.out", "./a.out", (char*) NULL) == -1)
+            if(execl("./a.out", "./a.out", inputFile(), (char*) NULL) == -1) // TODO DOROB PREPINACE
             {
-                perror("Error in execl(""./a.out"", ""./a.out"", (char*) NULL) occurred");
+                perror("Error in execl(""./a.out"", ""./a.out"", inputFile(), (char*) NULL) occurred");
                 exit(EXIT_FAILURE);
             }
         }

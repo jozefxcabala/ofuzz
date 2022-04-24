@@ -9,14 +9,18 @@ class CodeCoverage
 {
     int coverage_;
     std::vector<uint64_t> data_;
+    std::string inputFile_;
 
     public:
         CodeCoverage();
+        CodeCoverage(std::string inputFile);
 
         void setCoverage(int coverage);
         void setData(std::vector<uint64_t> data);
+        void setInputFile(std::string inputFile);
         
-        std::vector<uint64_t> data();    
+        std::vector<uint64_t> data();  
+        std::string inputFile();  
         int coverage();
 
         void start();
