@@ -12,6 +12,21 @@ BinaryFileInstrumentation::BinaryFileInstrumentation()
 {
 }
 
+BinaryFileInstrumentation::BinaryFileInstrumentation(std::string targetApplication)
+{
+    setTargetApplication(targetApplication);
+}
+
+void BinaryFileInstrumentation::setTargetApplication(std::string targetApplication)
+{
+    targetApplication_ = targetApplication;
+}
+
+std::string BinaryFileInstrumentation::targetApplication()
+{
+    return targetApplication_;
+}
+
 void BinaryFileInstrumentation::runE9PatchTool()
 {
     switch(fork())
@@ -24,9 +39,9 @@ void BinaryFileInstrumentation::runE9PatchTool()
         case 0:
         {
             //child
-            if(execl("./e9patch/e9tool", "./e9patch/e9tool", "-M", "asm=/j.*/", "-P", "entry(addr)@instrumentation.out", "example.out", (char*) NULL) == -1)
+            if(execl("./e9patch/e9tool", "./e9patch/e9tool", "-M", "asm=/j.*/", "-P", "entry(addr)@instrumentation.out", targetApplication(), (char*) NULL) == -1)
             {
-                perror("The following (""./e9patch/e9tool"", ""./e9patch/e9tool"", ""-M"", ""asm=/j.*/"", ""-P"", ""entry(addr)@instrumentation.out"", ""example.out"", (char*) NULL) error occurred");
+                perror(("The following (""./e9patch/e9tool"", ""./e9patch/e9tool"", ""-M"", ""asm=/j.*/"", ""-P"", ""entry(addr)@instrumentation.out"", """ + targetApplication() + """, (char*) NULL) error occurred").c_str());
                 exit(EXIT_FAILURE);
             }
         }

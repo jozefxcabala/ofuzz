@@ -5,11 +5,17 @@
 #ifndef BINARY_FILE_INSTRUMENTATION_H
 #define BINARY_FILE_INSTRUMENTATION_H
 
-class BinaryFileInstrumentation 
+class BinaryFileInstrumentation
 {
+    std::string targetApplication_;
+
     public:
         BinaryFileInstrumentation();
+        BinaryFileInstrumentation(std::string targetApplication);
         void start();
+
+        void setTargetApplication(std::string targetApplication);
+        std::string targetApplication();
 
     private:
         void runE9PatchTool();
