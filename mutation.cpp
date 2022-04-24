@@ -1,5 +1,10 @@
 #include "mutation.hpp"
 
+Mutation::Mutation()
+{
+	
+}
+
 std::vector<std::string> Mutation::magicVector()
 {
     return magicVector_;
