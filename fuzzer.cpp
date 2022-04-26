@@ -1,22 +1,17 @@
 #include "fuzzer.hpp"
+#include <iostream>
 
 Fuzzer::Fuzzer()
 {
 
 }
 
-Fuzzer::Fuzzer(BinaryFileInstrumentation binaryFileInstrumentation, SampleProcessing sampleProcessing, Mutation mutation, CrashesProcessing crashesProcessing, std::queue<Sample> corpus)
+Fuzzer::Fuzzer(SampleProcessing sampleProcessingA, Mutation mutationA, CrashesProcessing crashesProcessingA, std::queue<Sample> corpusA)
 {   
-    setBinaryFileInstrumentation(binaryFileInstrumentation);
-    setMutation(mutation);
-    setSampleProcessing(sampleProcessing);
-    setCrashesProcessing(crashesProcessing);
-    setCorpus(corpus);
-}
-
-void Fuzzer::setBinaryFileInstrumentation(BinaryFileInstrumentation binaryFileInstrumentation)
-{
-    binaryFileInstrumentation_ = binaryFileInstrumentation;
+    setMutation(mutationA);
+    setSampleProcessing(sampleProcessingA);
+    setCrashesProcessing(crashesProcessingA);
+    setCorpus(corpusA);
 }
 
 void Fuzzer::setCorpus(std::queue<Sample> corpus)
@@ -39,11 +34,6 @@ void Fuzzer::setCrashesProcessing(CrashesProcessing crashesProcessing)
     crashesProcessing_ = crashesProcessing;
 }
 
-BinaryFileInstrumentation Fuzzer::binaryFileInstrumentation()
-{
-    return binaryFileInstrumentation_;
-}
-
 std::queue<Sample> Fuzzer::corpus()
 {
     return corups_;
@@ -62,4 +52,9 @@ SampleProcessing Fuzzer::sampleProcessing()
 CrashesProcessing Fuzzer::crashesProcessing()
 {
     return crashesProcessing_;
+}
+
+void Fuzzer::start()
+{
+    std::cout << "uspesne som spustil fuzzer!" << std::endl;
 }

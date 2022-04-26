@@ -1,8 +1,5 @@
 #include "e9patch/examples/stdlib.c"
 
-/*
- * The counter.
- */
 static int fd;
 char myfifo [] = "myfifo";
 

@@ -84,9 +84,9 @@ void CodeCoverage::runInstrumentedBinaryFile()
         {
             redirectSTDOut();
 
-            if(execl("./a.out", "./a.out", inputFile(), (char*) NULL) == -1) // TODO DOROB PREPINACE
+            if(execl("./a.out", "./a.out", (char*) NULL) == -1) // TODO DOROB PREPINACE a INPUT FILE
             {
-                perror("Error in execl(""./a.out"", ""./a.out"", inputFile(), (char*) NULL) occurred");
+                perror("Error in execl(""./a.out"", ""./a.out"", (char*) NULL) occurred");
                 exit(EXIT_FAILURE);
             }
         }

@@ -1,12 +1,13 @@
 #include "fuzzer.hpp"
 #include "corpus-init.hpp"
+#include "binary-file-instrumentation.hpp"
 #include "iostream"
 
 void checkParameters(int argc, char** argv)
 {
-    if (argc < 5)
+    if (argc < 6)
 	{
-		std::cout << "Usage: ./app.out <target application> <dir for input samples> <dir for mutated files> <dir for crashes>" << std::endl;
+		std::cout << "Usage: ./app.out <dir for input samples> <dir for mutated files> <dir for crashes> <target application> <param>" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }
@@ -15,14 +16,20 @@ int main(int argc, char** argv)
 {
     checkParameters(argc, argv);
 
-    BinaryFileInstrumentation binaryFileInstrumentation(argv[1]);
-    SampleProcessing sampleProcessing(argv[3]);
+    CrashesProcessing crashesProcessing(argv[3]);
+    SampleProcessing sampleProcessing;
+    CorpusInit corpusInit(argv[1], sampleProcessing, 10);
     Mutation mutation;
-    CrashesProcessing crashesProcessing(argv[4]);
-    CorpusInit corpusInit(argv[2], sampleProcessing, 10);
+    BinaryFileInstrumentation binaryFileInstrumentation(argv[4]);
+
     std::queue<Sample> corpus = corpusInit.start();
-    Fuzzer fuzzer(binaryFileInstrumentation, sampleProcessing, mutation, crashesProcessing, corpus);
-    //fuzzer.start()
+    binaryFileInstrumentation.start();
+
+    Fuzzer fuzzer(sampleProcessing, mutation, crashesProcessing, corpus);
+
+    fuzzer.start();
+
+    //TODO spracovanie mena dir pre mutated files - asi to sprav tak aby si to priecinok vytvorilo samo 
 
     return 0;
 }

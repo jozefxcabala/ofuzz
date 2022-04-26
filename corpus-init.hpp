@@ -30,7 +30,7 @@ class CorpusInit
     private:
         std::queue<Sample> createNew();
         std::vector<std::string> getListOfFiles();
-        void copyInputFiles(int count, std::string data);
+        void copyInputFiles(int count, std::string data, std::string fileName);
 };
 
 #endif // CORPUS_INIT_H

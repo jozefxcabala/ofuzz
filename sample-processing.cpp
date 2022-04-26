@@ -3,46 +3,31 @@
 #include <fstream>
 #include <iostream>
 
-std::string SampleProcessing::dirForMutatedFiles()
-{
-	return difForMutatedFiles_;
-}
-
-void SampleProcessing::setDirForMutatedFiles(std::string dirForMutatedFiles)
-{
-	difForMutatedFiles_ = dirForMutatedFiles;
-}
-
 SampleProcessing::SampleProcessing()
 {
 
 }
 
-SampleProcessing::SampleProcessing(std::string dirForMutatedFiles)
+void SampleProcessing::createNew(std::string data, std::string fileName, std::string dirName)
 {
-	setDirForMutatedFiles(dirForMutatedFiles);
-}
-
-void SampleProcessing::createNew(std::string mutated, std::string fileName)
-{
-	std::ofstream fout(dirForMutatedFiles() + "/" + fileName, std::ios::binary);
+	std::ofstream fout(dirName + "/" + fileName, std::ios::binary);
 
 	if (fout.is_open())
 	{
 		fout.seekp(0, std::ios::beg);
-		fout.write(&mutated[0], mutated.size());
+		fout.write(&data[0], data.size());
 	}
 	else
 	{
-		std::cout << "Failed to create: " << (dirForMutatedFiles() + "/" + fileName) << std::endl; //TODO podla toho ako to mam inde
+		std::cout << "Failed to create: " << (dirName + "/" + fileName) << std::endl; //TODO podla toho ako to mam inde
 		exit(1);
 	}
 
 }
 
-std::string SampleProcessing::getBytes(std::string fileName)
+std::string SampleProcessing::getBytes(std::string fileName, std::string dirName)
 {
-	std::ifstream fin(dirForMutatedFiles() + "/" + fileName, std::ios::binary);
+	std::ifstream fin(dirName + "/" + fileName, std::ios::binary);
 
 	if (fin.is_open())
 	{
@@ -57,7 +42,7 @@ std::string SampleProcessing::getBytes(std::string fileName)
 
 	else
 	{
-		std::cout << "Failed to open " << dirForMutatedFiles() + "/" + fileName << ".\n";
+		std::cout << "Failed to open " << dirName + "/" + fileName << ".\n";
 		exit(1);
 	}
 

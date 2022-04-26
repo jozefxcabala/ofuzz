@@ -1,5 +1,6 @@
 #include "corpus-init.hpp"
 #include <filesystem>
+#include <iostream>
 
 CorpusInit::CorpusInit()
 {
@@ -63,11 +64,11 @@ std::vector<std::string> CorpusInit::getListOfFiles()
     return result;
 }
 
-void CorpusInit::copyInputFiles(int count, std::string data)
+void CorpusInit::copyInputFiles(int count, std::string data, std::string fileName)
 {
     for(int i = 0; i < count; i++)
     {
-        sampleProcessing().createNew(data, "input_copy" + std::to_string(i + 1));
+        sampleProcessing().createNew(data, std::to_string(i + 1) + "-copy-of-" + fileName, dirForInputSamples());
     }
 }
 
@@ -76,18 +77,22 @@ std::queue<Sample> CorpusInit::createNew()
     std::queue<Sample> result;
     std::vector<std::string> fileNames = getListOfFiles();
 
-
-    if(fileNames.size() < sizeOfCorpus())
+    if(fileNames.size() < sizeOfCorpus() && fileNames.size() != 0)
     {
-        copyInputFiles(sizeOfCorpus() - fileNames.size(), sampleProcessing().getBytes(fileNames.at(0)));
+        copyInputFiles(sizeOfCorpus() - fileNames.size(), sampleProcessing().getBytes(fileNames.at(0), dirForInputSamples()), fileNames.at(0));
         fileNames = getListOfFiles();
+    } 
+    else
+    {
+        std::cout << "You must create some input files in dir for inputs" << std::endl;
+        exit(EXIT_FAILURE);
     }
 
     for(int i = 0; i < fileNames.size(); i++)
     {
         CodeCoverage codeCoverage(fileNames.at(i));
-        codeCoverage.start();
-        Sample sample(sampleProcessing().getBytes(fileNames.at(i)), codeCoverage, fileNames.at(i));
+        // codeCoverage.start(); //TODO SPRAV TO V FUZZERY 
+        Sample sample(sampleProcessing().getBytes(fileNames.at(i), dirForInputSamples()), codeCoverage, fileNames.at(i));
         result.push(sample);
     }
 

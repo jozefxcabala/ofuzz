@@ -1,6 +1,5 @@
 #include <string>
 #include <queue>
-#include "binary-file-instrumentation.hpp"
 #include "sample.hpp"
 #include "sample-processing.hpp"
 #include "mutation.hpp"
@@ -11,7 +10,6 @@
 
 class Fuzzer 
 {
-    BinaryFileInstrumentation binaryFileInstrumentation_;
     SampleProcessing sampleProcessing_;
     Mutation mutation_;
     CrashesProcessing crashesProcessing_;
@@ -20,15 +18,13 @@ class Fuzzer
 
     public:
         Fuzzer();
-        Fuzzer(BinaryFileInstrumentation binaryFileInstrumentation, SampleProcessing sampleProcessing, Mutation mutation, CrashesProcessing crashesProcessing, std::queue<Sample> corpus);
+        Fuzzer(SampleProcessing sampleProcessing, Mutation mutation, CrashesProcessing crashesProcessing, std::queue<Sample> corpus);
 
-        BinaryFileInstrumentation binaryFileInstrumentation();
         SampleProcessing sampleProcessing();
         Mutation mutation();
         CrashesProcessing crashesProcessing();
         std::queue<Sample> corpus();
 
-        void setBinaryFileInstrumentation(BinaryFileInstrumentation binaryFileInstrumentation);
         void setSampleProcessing(SampleProcessing sampleProcessing);
         void setMutation(Mutation mutation);
         void setCrashesProcessing(CrashesProcessing crashesProcessing);
