@@ -9,28 +9,25 @@
 
 class CorpusInit 
 {
-    std::string dirForInputSamples_;
+    char** argv_;
     int sizeOfCorpus_;
-    SampleProcessing sampleProcessing_;
 
     public:
         CorpusInit();
-        CorpusInit(std::string dirForInputSamples, SampleProcessing sampleProcessing, int sizeOfCorpus);
+        CorpusInit(char** argv, int sizeOfCorpus);
 
         std::queue<Sample> start();
 
-        void setDirForInputSamples(std::string dirForInputSamples);
-        void setSampleProcessing(SampleProcessing sampleProcessing);
+        void setArgv(char** argv);
         void setSizeOfCorpus(int sizeOfCorpus);
 
-        std::string dirForInputSamples();
-        SampleProcessing sampleProcessing();
+        char** argv();
         int sizeOfCorpus();
 
     private:
         std::queue<Sample> createNew();
         std::vector<std::string> getListOfFiles();
-        void copyInputFiles(int count, std::string data, std::string fileName);
+        void copyInputFiles(int count, SampleProcessing sampleProcessing, std::string fileName);
 };
 
 #endif // CORPUS_INIT_H
