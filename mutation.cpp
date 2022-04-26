@@ -5,6 +5,11 @@ Mutation::Mutation()
 	
 }
 
+Mutation::Mutation(std::string dirForMutationsA)
+{
+	setDirForMutations(dirForMutationsA);
+}
+
 std::vector<std::string> Mutation::magicVector()
 {
     return magicVector_;
@@ -13,6 +18,16 @@ std::vector<std::string> Mutation::magicVector()
 void Mutation::setMagicVector(std::vector<std::string> magicVector)
 {
     magicVector_ = magicVector;
+}
+
+std::string Mutation::dirForMutations()
+{
+    return dirForMutations_;
+}
+
+void Mutation::setDirForMutations(std::string dirForMutations)
+{
+    dirForMutations_ = dirForMutations;
 }
 
 std::string Mutation::bitFlip(std::string data)
