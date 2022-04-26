@@ -1,17 +1,16 @@
 #include "fuzzer.hpp"
 #include <iostream>
+#include <chrono>
 
 Fuzzer::Fuzzer()
 {
 
 }
 
-Fuzzer::Fuzzer(SampleProcessing sampleProcessingA, Mutation mutationA, CrashesProcessing crashesProcessingA, std::queue<Sample> corpusA)
+Fuzzer::Fuzzer(std::queue<Sample> corpusA, int numberOfIterationsA)
 {   
-    setMutation(mutationA);
-    setSampleProcessing(sampleProcessingA);
-    setCrashesProcessing(crashesProcessingA);
     setCorpus(corpusA);
+    setNumberOfIterations(numberOfIterationsA);
 }
 
 void Fuzzer::setCorpus(std::queue<Sample> corpus)
@@ -19,42 +18,46 @@ void Fuzzer::setCorpus(std::queue<Sample> corpus)
     corups_ = corpus;
 }
 
-void Fuzzer::setMutation(Mutation mutation)
-{
-    mutation_ = mutation;
-}
-
-void Fuzzer::setSampleProcessing(SampleProcessing sampleProcessing)
-{
-    sampleProcessing_ = sampleProcessing;
-}
-
-void Fuzzer::setCrashesProcessing(CrashesProcessing crashesProcessing)
-{
-    crashesProcessing_ = crashesProcessing;
-}
-
 std::queue<Sample> Fuzzer::corpus()
 {
     return corups_;
 }
 
-Mutation Fuzzer::mutation()
+void Fuzzer::setNumberOfIterations(int numberOfIterations)
 {
-    return mutation_;
+    numberOfIterations_ = numberOfIterations;
 }
 
-SampleProcessing Fuzzer::sampleProcessing()
+int Fuzzer::numberOfIterations()
 {
-    return sampleProcessing_;
-}
-
-CrashesProcessing Fuzzer::crashesProcessing()
-{
-    return crashesProcessing_;
+    return numberOfIterations_;
 }
 
 void Fuzzer::start()
 {
     std::cout << "uspesne som spustil fuzzer!" << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
+
+    int counter = 0;
+
+    while(counter < numberOfIterations())
+    {
+        while (!corpus().empty())
+        {
+            Sample corpusElement = corpus().front();
+            corpusElement.codeCoverage().start();
+            std::cout << corpusElement.fileName() << " - coverage: " << corpusElement.codeCoverage().coverage() << std::endl;
+            corpusElement.codeCoverage().printData();
+            corpus().pop();
+            corpus().push(corpusElement);
+            
+            break;
+        }
+
+        counter++;
+    }
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    std::cout << "execution time: " << duration.count() << "ms" << std::endl;
 }
