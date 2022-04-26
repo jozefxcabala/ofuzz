@@ -177,7 +177,6 @@ void CodeCoverage::closeMyFifo()
 void CodeCoverage::start()
 {
     calculateCoverage();
-
 }
 
 void CodeCoverage::printData()
