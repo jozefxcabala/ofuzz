@@ -16,20 +16,18 @@ int main(int argc, char** argv)
 {
     checkParameters(argc, argv);
 
-    CrashesProcessing crashesProcessing(argv[3]);
-    SampleProcessing sampleProcessing;
-    CorpusInit corpusInit(argv[1], sampleProcessing, 10);
-    Mutation mutation;
+    CorpusInit corpusInit(argv, 10);
     BinaryFileInstrumentation binaryFileInstrumentation(argv[4]);
 
     std::queue<Sample> corpus = corpusInit.start();
     binaryFileInstrumentation.start();
 
-    Fuzzer fuzzer(sampleProcessing, mutation, crashesProcessing, corpus);
+    Fuzzer fuzzer(corpus, 1);
 
     fuzzer.start();
 
-    //TODO spracovanie mena dir pre mutated files - asi to sprav tak aby si to priecinok vytvorilo samo 
+    //TODO asi to sprav tak aby si to priecinok vytvorilo samo pri crash_file a mutated_file
+    //TODO spracovanie argumentov pre spustenie programu
 
     return 0;
 }
