@@ -1,17 +1,21 @@
 #include <iostream>
 
-int main(){
+int main(int argc, char** argv){
     int x = 3;
     int y = 4;
 
+    if(argc < 2){
+        std::cout << "Zabudol si zadat argument" << std::endl;
+        return -1;
+    }
 
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < std::stoi(argv[1]); i++)
     {
         if((x + y) < 8)
         {
-            std::cout << "menej ako 8";
+            std::cout << i << std::endl;
         } else {
-            std::cout << "viac ako 8";
+            std::cout << -i << std::endl;
         }
     }
 
