@@ -21,7 +21,7 @@ class Sample
         Sample(SampleProcessing sampleProcessing, CodeCoverage codeCoverage, std::string fileName, CrashesProcessing crashesProcessing, Mutation mutation);
 
         std::string fileName();
-        CodeCoverage codeCoverage();
+        CodeCoverage& codeCoverage();
         SampleProcessing sampleProcessing();
         CrashesProcessing crashesProcessing();
         Mutation mutation();

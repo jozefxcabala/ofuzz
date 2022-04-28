@@ -19,7 +19,7 @@ std::string Sample::fileName()
     return fileName_;
 }
 
-CodeCoverage Sample::codeCoverage()
+CodeCoverage& Sample::codeCoverage()
 {
     return codeCoverage_;
 }

@@ -11,10 +11,11 @@ CorpusInit::CorpusInit()
 
 }
 
-CorpusInit::CorpusInit(char** argv, int sizeOfCorpus)
+CorpusInit::CorpusInit(char** argv, int sizeOfCorpus, int argc)
 {
     setArgv(argv);
     setSizeOfCorpus(sizeOfCorpus);
+    setArgc(argc);
 }
 
 std::queue<Sample> CorpusInit::start()
@@ -32,6 +33,11 @@ void CorpusInit::setSizeOfCorpus(int sizeOfCorpus)
     sizeOfCorpus_ = sizeOfCorpus;
 }
 
+void CorpusInit::setArgc(int argc)
+{
+    argc_ = argc;
+}
+
 char** CorpusInit::argv()
 {
     return argv_;
@@ -40,6 +46,11 @@ char** CorpusInit::argv()
 int CorpusInit::sizeOfCorpus()
 {
     return sizeOfCorpus_;
+}
+
+int CorpusInit::argc()
+{
+    return argc_;
 }
 
 std::vector<std::string> CorpusInit::getListOfFiles()
@@ -90,7 +101,7 @@ std::queue<Sample> CorpusInit::createNew()
         SampleProcessing sampleProcessing;
         Mutation mutation(argv()[2]);
         CrashesProcessing crashesProcessing(argv()[3]);
-        CodeCoverage codeCoverage(fileNames.at(i));
+        CodeCoverage codeCoverage(fileNames.at(i), argv(), argc());
         // codeCoverage.start(); //TODO SPRAV TO V FUZZERY 
         Sample sample(sampleProcessing, codeCoverage, fileNames.at(i), crashesProcessing, mutation);
         result.push(sample);

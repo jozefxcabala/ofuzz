@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 {
     checkParameters(argc, argv);
 
-    CorpusInit corpusInit(argv, 10);
+    CorpusInit corpusInit(argv, 10, argc);
     BinaryFileInstrumentation binaryFileInstrumentation(argv[4]);
 
     std::queue<Sample> corpus = corpusInit.start();

@@ -11,18 +11,21 @@ class CorpusInit
 {
     char** argv_;
     int sizeOfCorpus_;
+    int argc_;
 
     public:
         CorpusInit();
-        CorpusInit(char** argv, int sizeOfCorpus);
+        CorpusInit(char** argv, int sizeOfCorpus, int argc);
 
         std::queue<Sample> start();
 
         void setArgv(char** argv);
         void setSizeOfCorpus(int sizeOfCorpus);
+        void setArgc(int argc);
 
         char** argv();
         int sizeOfCorpus();
+        int argc();
 
     private:
         std::queue<Sample> createNew();

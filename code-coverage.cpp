@@ -14,9 +14,16 @@ CodeCoverage::CodeCoverage()
 
 }
 
-CodeCoverage::CodeCoverage(std::string inputFile)
+CodeCoverage::CodeCoverage(std::string inputFile, char** argvA, int argcA)
 {
     setInputFile(inputFile);
+    setArgv(argvA);
+    setArgc(argcA);
+}
+
+void CodeCoverage::setArgv(char** argv)
+{
+    argv_ = argv;
 }
 
 void CodeCoverage::setInputFile(std::string inputFile)
@@ -39,6 +46,11 @@ void CodeCoverage::setCoverage(int coverage)
     coverage_ = coverage;
 }
 
+void CodeCoverage::setArgc(int argc)
+{
+    argc_ = argc;
+}
+
 std::vector<uint64_t> CodeCoverage::data()
 {
     return data_;
@@ -49,6 +61,15 @@ int CodeCoverage::coverage()
     return coverage_;
 }
 
+char** CodeCoverage::argv()
+{
+    return argv_;
+}
+
+int CodeCoverage::argc()
+{
+    return argc_;
+}
 
 void CodeCoverage::createMyFifo()
 {    
@@ -84,9 +105,25 @@ void CodeCoverage::runInstrumentedBinaryFile()
         {
             redirectSTDOut();
 
-            if(execl("./a.out", "./a.out", (char*) NULL) == -1) // TODO DOROB PREPINACE a INPUT FILE
+            if(argc() == 6)
             {
-                perror("Error in execl(""./a.out"", ""./a.out"", (char*) NULL) occurred");
+                if(execl("./a.out", "./a.out", argv()[5],(char*) NULL) == -1) // TODO DOROB PREPINACE a INPUT FILE
+                {
+                    perror("Error in execl(""./a.out"", ""./a.out"", (char*) NULL) occurred");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else if(argc() == 7)
+            {
+                if(execl("./a.out", "./a.out", argv()[5], argv()[6], (char*) NULL) == -1) // TODO DOROB PREPINACE a INPUT FILE
+                {
+                    perror("Error in execl(""./a.out"", ""./a.out"", (char*) NULL) occurred");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else
+            {
+                perror("Not supported number of arguments");
                 exit(EXIT_FAILURE);
             }
         }
@@ -97,6 +134,7 @@ void CodeCoverage::runInstrumentedBinaryFile()
         }
     }
 }
+
 
 void CodeCoverage::redirectSTDOut()
 {
