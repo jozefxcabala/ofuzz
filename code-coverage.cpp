@@ -19,6 +19,7 @@ CodeCoverage::CodeCoverage(std::string inputFile, char** argvA, int argcA)
     setInputFile(inputFile);
     setArgv(argvA);
     setArgc(argcA);
+    setCoverage(0);
 }
 
 void CodeCoverage::setArgv(char** argv)
@@ -107,7 +108,7 @@ void CodeCoverage::runInstrumentedBinaryFile()
 
             if(argc() == 6)
             {
-                if(execl("./a.out", "./a.out", argv()[5],(char*) NULL) == -1) // TODO DOROB PREPINACE a INPUT FILE
+                if(execl("./a.out", "./a.out", inputFile(),(char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
                 {
                     perror("Error in execl(""./a.out"", ""./a.out"", (char*) NULL) occurred");
                     exit(EXIT_FAILURE);
@@ -115,7 +116,7 @@ void CodeCoverage::runInstrumentedBinaryFile()
             }
             else if(argc() == 7)
             {
-                if(execl("./a.out", "./a.out", argv()[5], argv()[6], (char*) NULL) == -1) // TODO DOROB PREPINACE a INPUT FILE
+                if(execl("./a.out", "./a.out", argv()[5], inputFile(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
                 {
                     perror("Error in execl(""./a.out"", ""./a.out"", (char*) NULL) occurred");
                     exit(EXIT_FAILURE);
