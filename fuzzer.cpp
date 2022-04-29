@@ -1,24 +1,26 @@
 #include "fuzzer.hpp"
 #include <iostream>
 #include <chrono>
+#include <thread>
+#include <functional>
 
 Fuzzer::Fuzzer()
 {
 
 }
 
-Fuzzer::Fuzzer(std::queue<Sample> corpusA, int numberOfIterationsA)
+Fuzzer::Fuzzer(std::vector<Sample> corpusA, int numberOfIterationsA)
 {   
     setCorpus(corpusA);
     setNumberOfIterations(numberOfIterationsA);
 }
 
-void Fuzzer::setCorpus(std::queue<Sample> corpus)
+void Fuzzer::setCorpus(std::vector<Sample> corpus)
 {
     corups_ = corpus;
 }
 
-std::queue<Sample> Fuzzer::corpus()
+std::vector<Sample>& Fuzzer::corpus()
 {
     return corups_;
 }
@@ -33,31 +35,89 @@ int Fuzzer::numberOfIterations()
     return numberOfIterations_;
 }
 
+void Fuzzer::fuzzing(int id)
+{
+    while(KEEP_GOING.load()){
+        std::cout << "fuzzing by thread: " << id << std::endl;
+
+        Sample sample = corpus().at(id);
+        std::string previousData = sample.sampleProcessing().getBytes(sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName
+        int previousCoverage = sample.codeCoverage().coverage();
+
+        std::string newData = sample.mutation().start(2, previousData);
+        sample.sampleProcessing().createNew(newData, sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName
+        sample.codeCoverage().start();
+
+        int newCoverage = sample.codeCoverage().coverage();
+
+        if(newCoverage > previousCoverage)
+        {
+            if(newCoverage > BEST_COVERAGE.load())
+            {
+                BEST_COVERAGE.store(newCoverage); 
+                std::cout << "best coverage: " << BEST_COVERAGE.load() << " improved by thread: " << id << std::endl;
+                //TODO distribucia najlepsej SAMPLE
+            }
+        }
+        else
+        {
+            sample.sampleProcessing().createNew(previousData, sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName
+        }
+    }
+}
+
 void Fuzzer::start()
 {
     std::cout << "uspesne som spustil fuzzer!" << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
 
     int counter = 0;
+    BEST_COVERAGE.store(0);
+    KEEP_GOING.store(true);
+
+    std::thread threads[corpus().size()];
+
+    for(int i = 0; i < corpus().size(); i++)
+    {
+        threads[i] = std::thread(&Fuzzer::fuzzing, this, std::ref(i));
+    }
 
     while(counter < numberOfIterations())
     {
-        while (!corpus().empty())
-        {
-            Sample corpusElement = corpus().front();
-            corpusElement.codeCoverage().start();
-            std::cout << corpusElement.fileName() << " - coverage: " << corpusElement.codeCoverage().coverage() << std::endl;
-            corpusElement.codeCoverage().printData();
-            corpus().pop();
-            corpus().push(corpusElement);
-            
-            break;
-        }
-
         counter++;
+
+        if(counter == numberOfIterations())
+        {
+            KEEP_GOING.store(false);
+        }
+    }
+
+    for (int i = 0; i < corpus().size(); i++)
+    {
+        threads[i].join();
     }
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << "execution time: " << duration.count() << "ms" << std::endl;
 }
+
+/***
+ * 1. spustenie
+ *  vypocitaj code coverage
+ * 2. - posledne spusteni
+ *  nacitanie dat
+ *  mutacia
+ *  code coverage
+ *  vyhodnotenie, ci je code coverage lepsi ako ten predtym v danej sample
+ *      ak je lepsi, nechaj
+ *      ak nie je lepsi, zahod mutaciu
+ *  vyhodnoteniel ci je code coverage najlepsi celkovo
+ *      ak je zamkni vsetko a odomknutu nechaj len thread, ktora ma najlepsi code coverage, ten uloz a rozposli ostatnym
+ *      ak nie je nerob nic
+ *  ak nastane pad programu, ulozh crash
+ * 
+ * mal by si mat samlples ulozene v niecom inom ako queue
+ ***/
+
+

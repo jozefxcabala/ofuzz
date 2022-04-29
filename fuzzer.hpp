@@ -1,26 +1,34 @@
 #include <string>
-#include <queue>
+#include <vector>
+#include <atomic>
 #include "sample.hpp"
 
 #ifndef FUZZER_H
 #define FUZZER_H
 
+static std::atomic<bool> KEEP_GOING;
+static std::atomic<int> BEST_COVERAGE;
+
+
 class Fuzzer 
 {
-    std::queue<Sample> corups_;
+    std::vector<Sample> corups_;
     int numberOfIterations_;
 
     public:
         Fuzzer();
-        Fuzzer(std::queue<Sample> corpusA, int numberOfIterationsA);
+        Fuzzer(std::vector<Sample> corpusA, int numberOfIterationsA);
 
-        std::queue<Sample> corpus();
+        std::vector<Sample>& corpus();
         int numberOfIterations();
         
-        void setCorpus(std::queue<Sample> corpus);
+        void setCorpus(std::vector<Sample> corpus);
         void setNumberOfIterations(int numberOfIterations);
 
         void start();
+
+    private:
+        void fuzzing(int id);
 
 };
 
