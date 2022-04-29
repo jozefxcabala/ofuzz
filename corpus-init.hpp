@@ -17,7 +17,7 @@ class CorpusInit
         CorpusInit();
         CorpusInit(char** argv, int sizeOfCorpus, int argc);
 
-        std::queue<Sample> start();
+        std::vector<Sample> start();
 
         void setArgv(char** argv);
         void setSizeOfCorpus(int sizeOfCorpus);
@@ -28,7 +28,7 @@ class CorpusInit
         int argc();
 
     private:
-        std::queue<Sample> createNew();
+        std::vector<Sample> createNew();
         std::vector<std::string> getListOfFiles();
         void copyInputFiles(int count, SampleProcessing sampleProcessing, std::string fileName);
 };
