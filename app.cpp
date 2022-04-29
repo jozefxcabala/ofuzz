@@ -19,7 +19,7 @@ int main(int argc, char** argv)
     CorpusInit corpusInit(argv, 10, argc);
     BinaryFileInstrumentation binaryFileInstrumentation(argv[4]);
 
-    std::queue<Sample> corpus = corpusInit.start();
+    std::vector<Sample> corpus = corpusInit.start();
     binaryFileInstrumentation.start();
 
     Fuzzer fuzzer(corpus, 1);
@@ -27,7 +27,6 @@ int main(int argc, char** argv)
     fuzzer.start();
 
     //TODO asi to sprav tak aby si to priecinok vytvorilo samo pri crash_file a mutated_file
-    //TODO spracovanie argumentov pre spustenie programu
 
     return 0;
 }
