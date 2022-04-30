@@ -37,16 +37,20 @@ int Fuzzer::numberOfIterations()
 
 void Fuzzer::fuzzing(int id)
 {
-    while(KEEP_GOING.load()){
+    while(ITERATIONS.load() < 100){
         std::cout << "fuzzing by thread: " << id << std::endl;
 
         Sample sample = corpus().at(id);
-        std::string previousData = sample.sampleProcessing().getBytes(sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName
+        std::string previousData = sample.sampleProcessing().getBytes(sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName // TU JE TIEZ CHYBA NACITA 0 BYTESinfo 
         int previousCoverage = sample.codeCoverage().coverage();
 
-        std::string newData = sample.mutation().start(2, previousData);
+        std::string newData = sample.mutation().start(0, previousData);
+
         sample.sampleProcessing().createNew(newData, sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName
+
+        mutex.lock();
         sample.codeCoverage().start();
+        mutex.unlock();
 
         int newCoverage = sample.codeCoverage().coverage();
 
@@ -63,6 +67,8 @@ void Fuzzer::fuzzing(int id)
         {
             sample.sampleProcessing().createNew(previousData, sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName
         }
+
+        ITERATIONS.store(ITERATIONS.load() + 1);
     }
 }
 
@@ -73,24 +79,26 @@ void Fuzzer::start()
 
     int counter = 0;
     BEST_COVERAGE.store(0);
-    KEEP_GOING.store(true);
 
     std::thread threads[corpus().size()];
+
+    //KEEP_GOING.store(true);
+    ITERATIONS.store(0);
 
     for(int i = 0; i < corpus().size(); i++)
     {
         threads[i] = std::thread(&Fuzzer::fuzzing, this, std::ref(i));
     }
 
-    while(counter < numberOfIterations())
-    {
-        counter++;
+    // while(counter < numberOfIterations())
+    // {
+    //     counter++;
 
-        if(counter == numberOfIterations())
-        {
-            KEEP_GOING.store(false);
-        }
-    }
+    //     if(counter == numberOfIterations())
+    //     {
+    //         KEEP_GOING.store(false);
+    //     }
+    // }
 
     for (int i = 0; i < corpus().size(); i++)
     {
