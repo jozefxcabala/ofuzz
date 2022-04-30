@@ -71,10 +71,12 @@ std::vector<std::string> CorpusInit::getListOfFiles()
 void CorpusInit::copyInputFiles(int count, SampleProcessing sampleProcessing, std::string fileName)
 {
     std::string data = sampleProcessing.getBytes(fileName, argv()[1]);
+    sampleProcessing.createNew(data, fileName, argv()[2]);
 
     for(int i = 0; i < count; i++)
     {
         sampleProcessing.createNew(data, std::to_string(i + 1) + "-copy-of-" + fileName, argv()[1]);
+        sampleProcessing.createNew(data, std::to_string(i + 1) + "-copy-of-" + fileName, argv()[2]);
     }
 }
 
