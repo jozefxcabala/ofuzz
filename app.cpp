@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     std::vector<Sample> corpus = corpusInit.start();
     binaryFileInstrumentation.start();
 
-    Fuzzer fuzzer(corpus, 1);
+    Fuzzer fuzzer(corpus, 100);
 
     fuzzer.start();
 
