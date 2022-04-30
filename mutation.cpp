@@ -1,4 +1,5 @@
 #include "mutation.hpp"
+#include <iostream>
 
 Mutation::Mutation()
 {
@@ -33,14 +34,28 @@ void Mutation::setDirForMutations(std::string dirForMutations)
 std::string Mutation::bitFlip(std::string data)
 {
 	
-	int size = (data.length() - 4);
+	int size = (data.length());
 	int numOfFlips = (int)(size * .01);
+
+	if(numOfFlips == 0)
+	{
+		numOfFlips = 1;
+	}
 
 	// get a vector full of 1% of random byte indexes
 	std::vector<int> pickedIndexes;
 	for (int i = 0; i < numOfFlips; i++)
 	{
-		int pickedIndex = rand() % size;
+		int pickedIndex;
+		if(size == 1)
+		{
+			pickedIndex = rand() % (size);
+		}
+		else
+		{
+			pickedIndex = rand() % (size - 1);
+		}
+		
 		pickedIndexes.push_back(pickedIndex);
 	}
 
@@ -85,13 +100,13 @@ std::vector<std::string> Mutation::vectorGen()
 
 std::string Mutation::magic(std::string data, std::vector<std::string> magic)
 {
-	
 	int vectorSize = magic.size();
 	int pickedMagicIndex = rand() % vectorSize;
 	std::string pickedMagic = magic[pickedMagicIndex];
-	int size = (data.length() - 4);
+	int size = (data.length()); //MOZNO ZMENIT 4ku
 	int pickedDataIndex = rand() % size;
 	data.replace(pickedDataIndex, magic[pickedMagicIndex].length(), magic[pickedMagicIndex]);
+	// taketo hodnoty mame: 2 , magic[7].length(), magic[7]) 
 
 	return data;
 
