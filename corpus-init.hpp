@@ -31,6 +31,8 @@ class CorpusInit
         std::vector<Sample> createNew();
         std::vector<std::string> getListOfFiles();
         void copyInputFiles(int count, SampleProcessing sampleProcessing, std::string fileName);
+        void createMutationFiles(int count, SampleProcessing sampleProcessing, std::vector<std::string> listOfFiles);
+        void createDir(std::string dirName);
 };
 
 #endif // CORPUS_INIT_H
