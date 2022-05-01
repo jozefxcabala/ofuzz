@@ -2,6 +2,7 @@
 #include <vector>
 #include <atomic>
 #include <mutex>
+#include <signal.h>
 #include "sample.hpp"
 
 #ifndef FUZZER_H
@@ -10,8 +11,6 @@
 static std::atomic<bool> KEEP_GOING;
 static std::atomic<int> BEST_COVERAGE;
 static std::mutex mutex;
-static std::atomic<int> ITERATIONS;
-
 
 class Fuzzer 
 {

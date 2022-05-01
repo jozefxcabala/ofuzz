@@ -35,9 +35,15 @@ int Fuzzer::numberOfIterations()
     return numberOfIterations_;
 }
 
+static void handlerOfCtrlC(int s)
+{
+    printf("Caught signal: %d\n",s);
+    KEEP_GOING.store(false);
+}
+
 void Fuzzer::fuzzing(int id)
 {
-    while(ITERATIONS.load() < 100){
+    while(KEEP_GOING.load()){
         std::cout << "fuzzing by thread: " << id << std::endl;
 
         Sample sample = corpus().at(id);
@@ -67,8 +73,6 @@ void Fuzzer::fuzzing(int id)
         {
             sample.sampleProcessing().createNew(previousData, sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName
         }
-
-        ITERATIONS.store(ITERATIONS.load() + 1);
     }
 }
 
@@ -77,28 +81,25 @@ void Fuzzer::start()
     std::cout << "uspesne som spustil fuzzer!" << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
 
+    struct sigaction sigIntHandler;
+
+    sigIntHandler.sa_handler = handlerOfCtrlC;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+
+    sigaction(SIGINT, &sigIntHandler, NULL);
+
     int counter = 0;
     BEST_COVERAGE.store(0);
 
     std::thread threads[corpus().size()];
 
-    //KEEP_GOING.store(true);
-    ITERATIONS.store(0);
+    KEEP_GOING.store(true);
 
     for(int i = 0; i < corpus().size(); i++)
     {
         threads[i] = std::thread(&Fuzzer::fuzzing, this, std::ref(i));
     }
-
-    // while(counter < numberOfIterations())
-    // {
-    //     counter++;
-
-    //     if(counter == numberOfIterations())
-    //     {
-    //         KEEP_GOING.store(false);
-    //     }
-    // }
 
     for (int i = 0; i < corpus().size(); i++)
     {
