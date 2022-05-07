@@ -24,15 +24,9 @@ std::vector<Sample>& Fuzzer::corpus()
     return corups_;
 }
 
-static void handlerOfCtrlC(int s)
-{
-    printf("Caught signal: %d\n",s);
-    KEEP_GOING.store(false);
-}
-
 void Fuzzer::fuzzing(int id)
 {
-    while(KEEP_GOING.load()){
+    while(true){
         //std::cout << "fuzzing by thread: " << id << std::endl;
 
         mutex.lock();
@@ -72,20 +66,10 @@ void Fuzzer::start()
     std::cout << "uspesne som spustil fuzzer!" << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
 
-    struct sigaction sigIntHandler;
-
-    sigIntHandler.sa_handler = handlerOfCtrlC;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigIntHandler.sa_flags = 0;
-
-    sigaction(SIGINT, &sigIntHandler, NULL);
-
     int counter = 0;
     BEST_COVERAGE.store(0);
 
     std::thread threads[corpus().size()];
-
-    KEEP_GOING.store(true);
 
     for(int i = 0; i < corpus().size(); i++)
     {
@@ -97,9 +81,10 @@ void Fuzzer::start()
         threads[i].std::thread::join();
     }
 
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    std::cout << "execution time: " << duration.count() << "ms" << std::endl;
+    // TODO toto sprav v crash handling
+    // auto stop = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    // std::cout << "execution time: " << duration.count() << "ms" << std::endl;
 }
 
 /***

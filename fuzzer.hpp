@@ -8,7 +8,6 @@
 #ifndef FUZZER_H
 #define FUZZER_H
 
-static std::atomic<bool> KEEP_GOING;
 static std::atomic<int> BEST_COVERAGE;
 static std::mutex mutex;
 
