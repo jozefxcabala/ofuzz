@@ -70,6 +70,14 @@ std::string CorpusInit::createDir(std::string dirName)
 
 std::vector<Sample> CorpusInit::start()
 {
+    struct stat info;
+
+    if(stat(argv()[1], &info) != 0)
+    {
+        perror("input_file dont exist");
+        exit(EXIT_FAILURE);
+    }
+
     setDirForMutations(createDir("mutations-file"));
     setDirForCrashes(createDir("crashes-file"));
     
