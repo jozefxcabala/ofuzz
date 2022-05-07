@@ -29,7 +29,9 @@ std::string BinaryFileInstrumentation::targetApplication()
 
 void BinaryFileInstrumentation::runE9PatchTool()
 {
-    switch(fork())
+    int childPid;
+
+    switch(childPid = fork())
     {
         case -1:
         {
@@ -47,6 +49,14 @@ void BinaryFileInstrumentation::runE9PatchTool()
         }
         default:
         {
+            int returnStatus;    
+            waitpid(childPid, &returnStatus, 0);  // Parent process waits here for child to terminate.
+
+            if (returnStatus == 1)      
+            {
+                perror("The child process (binary instrumentation) terminated with an error!.");
+                exit(EXIT_FAILURE);
+            }
         }
     }
 }
