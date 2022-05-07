@@ -15,17 +15,14 @@ static std::mutex mutex;
 class Fuzzer 
 {
     std::vector<Sample> corups_;
-    int numberOfIterations_;
 
     public:
         Fuzzer();
-        Fuzzer(std::vector<Sample> corpusA, int numberOfIterationsA);
+        Fuzzer(std::vector<Sample> corpusA);
 
         std::vector<Sample>& corpus();
-        int numberOfIterations();
-        
+
         void setCorpus(std::vector<Sample> corpus);
-        void setNumberOfIterations(int numberOfIterations);
 
         void start();
 

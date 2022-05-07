@@ -9,10 +9,9 @@ Fuzzer::Fuzzer()
 
 }
 
-Fuzzer::Fuzzer(std::vector<Sample> corpusA, int numberOfIterationsA)
+Fuzzer::Fuzzer(std::vector<Sample> corpusA)
 {   
     setCorpus(corpusA);
-    setNumberOfIterations(numberOfIterationsA);
 }
 
 void Fuzzer::setCorpus(std::vector<Sample> corpus)
@@ -25,16 +24,6 @@ std::vector<Sample>& Fuzzer::corpus()
     return corups_;
 }
 
-void Fuzzer::setNumberOfIterations(int numberOfIterations)
-{
-    numberOfIterations_ = numberOfIterations;
-}
-
-int Fuzzer::numberOfIterations()
-{
-    return numberOfIterations_;
-}
-
 static void handlerOfCtrlC(int s)
 {
     printf("Caught signal: %d\n",s);
@@ -44,15 +33,17 @@ static void handlerOfCtrlC(int s)
 void Fuzzer::fuzzing(int id)
 {
     while(KEEP_GOING.load()){
-        std::cout << "fuzzing by thread: " << id << std::endl;
+        //std::cout << "fuzzing by thread: " << id << std::endl;
 
+        mutex.lock();
         Sample sample = corpus().at(id);
-        std::string previousData = sample.sampleProcessing().getBytes(sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName // TU JE TIEZ CHYBA NACITA 0 BYTESinfo 
+        mutex.unlock();
+        std::string previousData = sample.sampleProcessing().getBytes(sample.fileName(), sample.mutation().dirForMutations()); //TODO zmen to umiestnenie dirName // TU JE TIEZ CHYBA NACITA 0 BYTESinfo 
         int previousCoverage = sample.codeCoverage().coverage();
 
         std::string newData = sample.mutation().start(0, previousData);
 
-        sample.sampleProcessing().createNew(newData, sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName
+        sample.sampleProcessing().createNew(newData, sample.fileName(), sample.mutation().dirForMutations()); //TODO zmen to umiestnenie dirName
 
         mutex.lock();
         sample.codeCoverage().start();
@@ -65,7 +56,7 @@ void Fuzzer::fuzzing(int id)
             if(newCoverage > BEST_COVERAGE.load())
             {
                 BEST_COVERAGE.store(newCoverage); 
-                std::cout << "best coverage: " << BEST_COVERAGE.load() << " improved by thread: " << id << std::endl;
+                //std::cout << "best coverage: " << BEST_COVERAGE.load() << " improved by thread: " << id << std::endl;
                 //TODO distribucia najlepsej SAMPLE
             }
         }
@@ -103,7 +94,7 @@ void Fuzzer::start()
 
     for (int i = 0; i < corpus().size(); i++)
     {
-        threads[i].join();
+        threads[i].std::thread::join();
     }
 
     auto stop = std::chrono::high_resolution_clock::now();

@@ -106,7 +106,7 @@ void CodeCoverage::runInstrumentedBinaryFile()
         {
             redirectSTDOut();
 
-            if(argc() == 6)
+            if(argc() == 4)
             {
                 if(execl("./a.out", "./a.out", inputFile(),(char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
                 {
@@ -114,9 +114,9 @@ void CodeCoverage::runInstrumentedBinaryFile()
                     exit(EXIT_FAILURE);
                 }
             }
-            else if(argc() == 7)
+            else if(argc() == 5)
             {
-                if(execl("./a.out", "./a.out", argv()[5], inputFile(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
+                if(execl("./a.out", "./a.out", argv()[3], inputFile(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
                 {
                     perror("Error in execl(""./a.out"", ""./a.out"", (char*) NULL) occurred");
                     exit(EXIT_FAILURE);

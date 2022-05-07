@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <iostream>
 #include <sys/stat.h>
+#include <iomanip>
+#include <ctime>
 
 CorpusInit::CorpusInit()
 {
@@ -19,24 +21,57 @@ CorpusInit::CorpusInit(char** argv, int sizeOfCorpus, int argc)
     setArgc(argc);
 }
 
-void CorpusInit::createDir(std::string dirName)
+std::string CorpusInit::getDate()
+{
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "-%d-%m-%Y-%H-%M-%S");
+
+    return oss.str();
+}
+
+std::string CorpusInit::dirForCrashes()
+{
+    return dirForCrashes_;
+}
+
+std::string CorpusInit::dirForMutations()
+{
+    return dirForMutations_;
+}
+
+void CorpusInit::setDirForCrashes(std::string dir)
+{
+    dirForCrashes_ = dir;
+}
+
+void CorpusInit::setDirForMutations(std::string dir)
+{
+    dirForMutations_ = dir;
+}
+
+std::string CorpusInit::createDir(std::string dirName)
 {
     struct stat info;
 
-	if(stat(dirName.c_str(), &info) != 0)
+	if(stat((dirName + getDate()).c_str(), &info) != 0)
 	{
-		if(std::filesystem::create_directories(dirName) == false)
+		if(std::filesystem::create_directories(dirName + getDate()) == false)
 		{
-			std::cout << "creat directory: " << dirName << " dont work" << std::endl;
+			std::cout << "creat directory: " << dirName + getDate() << " dont work" << std::endl;
 			exit(EXIT_FAILURE); 
 		}
 	}
+
+    return dirName + getDate();
 }
 
 std::vector<Sample> CorpusInit::start()
 {
-    createDir(argv()[2]);
-    createDir(argv()[3]);
+    setDirForMutations(createDir("mutations-file"));
+    setDirForCrashes(createDir("crashes-file"));
     
     return createNew();
 }
@@ -103,7 +138,7 @@ void CorpusInit::createMutationFiles(int count, SampleProcessing sampleProcessin
     for(int i = 0; i < count; i++)
     {
         data = sampleProcessing.getBytes(listOfFiles.at(i), argv()[1]);
-        sampleProcessing.createNew(data, listOfFiles.at(i), argv()[2]);
+        sampleProcessing.createNew(data, listOfFiles.at(i), dirForMutations());
     }
 }
 
@@ -133,8 +168,8 @@ std::vector<Sample> CorpusInit::createNew()
     {
         
         SampleProcessing sampleProcessing;
-        Mutation mutation(argv()[2]);
-        CrashesProcessing crashesProcessing(argv()[3]);
+        Mutation mutation(dirForMutations());
+        CrashesProcessing crashesProcessing(dirForCrashes());
         CodeCoverage codeCoverage(fileNames.at(i), argv(), argc());
         Sample sample(sampleProcessing, codeCoverage, fileNames.at(i), crashesProcessing, mutation);
         result.push_back(sample);
