@@ -84,7 +84,7 @@ void Fuzzer::start()
 
     std::thread threads[corpus().size()];
 
-    LOG_DEBUG("Start of creating threads");
+    LOG_DEBUG("Start of creating threads, count: %d", corpus().size());
     for(int i = 0; i < corpus().size(); i++)
     {
         LOG_DEBUG("Thread %d is going to be create", i);
