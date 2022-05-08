@@ -2,6 +2,8 @@
 #include "corpus-init.hpp"
 #include "binary-file-instrumentation.hpp"
 #include "iostream"
+#include "logger.hpp"
+#include "assert.h"
 
 void checkParameters(int argc, char** argv)
 {
@@ -14,6 +16,7 @@ void checkParameters(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
+    LOG_INFO("App was started!");
     checkParameters(argc, argv);
 
     CorpusInit corpusInit(argv, 10, argc);
