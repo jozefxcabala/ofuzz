@@ -7,11 +7,13 @@
 
 void checkParameters(int argc, char** argv)
 {
+    LOG_INFO("Checking parameters");
     if (argc < 3)
 	{
-		std::cout << "Usage: ./app.out <dir for input samples> <target application> <param>" << std::endl;
+        LOG_ERROR("Usage: ./app.out <dir for input samples> <target application> <param>");
 		exit(EXIT_FAILURE);
 	}
+    LOG_INFO("Parameters are ok");
 }
 
 int main(int argc, char** argv)

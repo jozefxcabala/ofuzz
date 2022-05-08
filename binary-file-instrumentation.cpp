@@ -7,6 +7,8 @@
 #include <sstream>
 #include <sys/wait.h>
 #include <stdio.h>
+#include "logger.hpp"
+#include <cstring>
 
 BinaryFileInstrumentation::BinaryFileInstrumentation()
 {
@@ -29,21 +31,22 @@ std::string BinaryFileInstrumentation::targetApplication()
 
 void BinaryFileInstrumentation::runE9PatchTool()
 {
+    LOG_INFO("E9PatchTool was started");
     int childPid;
 
     switch(childPid = fork())
     {
         case -1:
         {
-            perror("The following fork() error occurred");
+            LOG_ERROR("The following fork() error occurred: %s", std::strerror(errno));
             exit(EXIT_FAILURE);
         }
         case 0:
         {
-            //child
+            LOG_INFO("Start of instrumentation");
             if(execl("./e9patch/e9tool", "./e9patch/e9tool", "-M", "asm=/j.*/", "-P", "entry(addr)@instrumentation.out", targetApplication().c_str(), (char*) NULL) == -1)
             {
-                perror(("The following (""./e9patch/e9tool"", ""./e9patch/e9tool"", ""-M"", ""asm=/j.*/"", ""-P"", ""entry(addr)@instrumentation.out"", """ + targetApplication() + """, (char*) NULL) error occurred").c_str());
+                LOG_ERROR("The following ""./e9patch/e9tool"", ""./e9patch/e9tool"", ""-M"", ""asm=/j.*/"", ""-P"", ""entry(addr)@instrumentation.out"", ""%s"", (char*) NULL) error occurred", targetApplication().c_str());
                 exit(EXIT_FAILURE);
             }
         }
@@ -54,15 +57,20 @@ void BinaryFileInstrumentation::runE9PatchTool()
 
             if (returnStatus == 1)      
             {
-                perror("The child process (binary instrumentation) terminated with an error!.");
+                LOG_ERROR("The child process (binary instrumentation) terminated with an error: %s", std::strerror(errno));
                 exit(EXIT_FAILURE);
             }
+            LOG_INFO("Instrumentation ended successfully");
         }
     }
+
+    LOG_INFO("E9PatchTool ended successfully");
 }
 
 void BinaryFileInstrumentation::start()
 {
+    LOG_INFO("Start binary file instrumentation");
     runE9PatchTool();
+    LOG_INFO("Binary file instrumentation ended successfully");
 }
 

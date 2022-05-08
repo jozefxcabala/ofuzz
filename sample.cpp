@@ -1,8 +1,8 @@
 #include "sample.hpp"
+#include "logger.hpp"
 
 Sample::Sample()
 {
-
 }
 
 Sample::Sample(SampleProcessing sampleProcessingA, CodeCoverage codeCoverageA, std::string fileNameA, CrashesProcessing crashesProcessingA, Mutation mutationA)

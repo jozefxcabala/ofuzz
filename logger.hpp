@@ -85,7 +85,7 @@ class Logger
 
 				std::scoped_lock lock(logMutex_);
 				printf("%s\t", buffer);
-				printf(messagePriorityStr);
+				printf("%s", messagePriorityStr);
 				printf(message, args...);
 				printf(" on line %d in %s", lineNumber, sourceFile);
 				printf("\n");
