@@ -113,10 +113,11 @@ void CodeCoverage::runInstrumentedBinaryFile()
         {
             redirectSTDOut();
 
-            LOG_DEBUG("Run target application");
+            LOG_DEBUG("Run target application with %s, num of arguments is %d", inputFile().c_str(), argc());
             if(argc() == 3)
             {
-                if(execl("./a.out", "./a.out", inputFile(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
+                LOG_DEBUG("DEBIKLKO");
+                if(execl("./a.out", "./a.out", inputFile().c_str(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
                 {
                     LOG_ERROR("Error in execl(""./a.out"", ""./a.out"", inputFile(), (char*) NULL) occurred: %s", std::strerror(errno));
                     exit(EXIT_FAILURE);
@@ -124,7 +125,7 @@ void CodeCoverage::runInstrumentedBinaryFile()
             }
             else if(argc() == 4)
             {
-                if(execl("./a.out", "./a.out", argv()[3], inputFile(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
+                if(execl("./a.out", "./a.out", argv()[3], inputFile().c_str(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
                 {
                     LOG_ERROR("Error in execl(""./a.out"", ""./a.out"", argv()[3], inputFile(), (char*) NULL) occurred: %s", std::strerror(errno));
                     exit(EXIT_FAILURE);
@@ -139,14 +140,14 @@ void CodeCoverage::runInstrumentedBinaryFile()
         default:
         {
             LOG_DEBUG("Waiting for end of instrumented target application");
-            int returnStatus;    
-            waitpid(childPid, &returnStatus, 0);  // Parent process waits here for child to terminate.
+            // int returnStatus;    
+            // waitpid(childPid, &returnStatus, 0);  // Parent process waits here for child to terminate.
 
-            if (returnStatus == 1)      
-            {
-                LOG_ERROR("The child process (running instrumented target application) terminated with an error: %s", std::strerror(errno));
-                exit(EXIT_FAILURE);
-            }
+            // if (returnStatus == 1)      
+            // {
+            //     LOG_ERROR("The child process (running instrumented target application) terminated with an error: %s", std::strerror(errno));
+            //     exit(EXIT_FAILURE);
+            // }
 
             LOG_DEBUG("Instrumented target application was ended successfully");
             setData(saveTheReachedBlocks());
@@ -186,7 +187,7 @@ void CodeCoverage::redirectSTDOut()
 
 bool CodeCoverage::checkForUniqueValue(std::vector<uint64_t> data, uint64_t value)
 {
-    LOG_INFO("Checking if values are unique");
+    LOG_DEBUG("Checking if values are unique");
     if (std::find(data.begin(), data.end(), value) != data.end()) {
         LOG_DEBUG("value is not unique");
         return false;

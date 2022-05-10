@@ -202,7 +202,7 @@ std::vector<Sample> CorpusInit::createNew()
         SampleProcessing sampleProcessing;
         Mutation mutation(dirForMutations());
         CrashesProcessing crashesProcessing(dirForCrashes());
-        CodeCoverage codeCoverage(fileNames.at(i), argv(), argc());
+        CodeCoverage codeCoverage(dirForMutations() + "/" + fileNames.at(i), argv(), argc());
         Sample sample(sampleProcessing, codeCoverage, fileNames.at(i), crashesProcessing, mutation);
         
         LOG_DEBUG("Sample of file %s, is pushing to vector", sample.fileName().c_str());

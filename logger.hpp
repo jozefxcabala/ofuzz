@@ -14,7 +14,7 @@ enum LogPriority
 
 class Logger
 {
-	LogPriority priority_ = DebugPriority; 
+	LogPriority priority_ = InfoPriority; 
 	std::mutex logMutex_;
 
 	public:

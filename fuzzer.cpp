@@ -45,7 +45,7 @@ void Fuzzer::fuzzing(int id)
         std::string newData = sample.mutation().start(0, previousData);
 
         LOG_DEBUG("Thread %d is trying to create rewrite data in orignal file", id);
-        sample.sampleProcessing().createNew(newData, sample.fileName(), sample.mutation().dirForMutations()); //TODO zmen to umiestnenie dirName
+        sample.sampleProcessing().createNew(newData, "thread-" + std::to_string(id) + "-" + sample.fileName(), sample.mutation().dirForMutations()); //TODO dopln thread do debugov a filenames
 
         LOG_DEBUG("Thread %d is trying to calculate new code coverage", id);
         mutex.lock();
@@ -68,7 +68,7 @@ void Fuzzer::fuzzing(int id)
         else
         {
             LOG_DEBUG("Thread %d: new coverage %d is lower than previous coverage %d, rewrite file back to original state", id, newCoverage, previousCoverage);
-            sample.sampleProcessing().createNew(previousData, sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName
+            sample.sampleProcessing().createNew(previousData, "thread-" + std::to_string(id) + "-" + sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName
         }
     }
 }
@@ -88,7 +88,7 @@ void Fuzzer::start()
     for(int i = 0; i < corpus().size(); i++)
     {
         LOG_DEBUG("Thread %d is going to be create", i);
-        threads[i] = std::thread(&Fuzzer::fuzzing, this, std::ref(i));
+        threads[i] = std::thread(&Fuzzer::fuzzing, this, i);
     }
 
     LOG_DEBUG("Start of joining threads");
