@@ -111,7 +111,7 @@ void CodeCoverage::runInstrumentedBinaryFile()
         }
         case 0:
         {
-            redirectSTDOut();
+            //redirectSTDOut(); //tuto je problem preto to nebezi, nevieme preco to funguje na jednom vlakne, ale na viacerych nie ... TODO mozes skusit vyriesit neskor 
 
             LOG_DEBUG("Run target application with %s, num of arguments is %d", inputFile().c_str(), argc());
             if(argc() == 3)
