@@ -169,6 +169,9 @@ void CorpusInit::createMutationFiles(int count, SampleProcessing sampleProcessin
         sampleProcessing.createNew(data, listOfFiles.at(i), dirForMutations());
     }
 
+    std::string suffix = listOfFiles.at(0).substr(listOfFiles.at(0).find(".")); //TODO oprav nie vzdy mas BODKU!
+    sampleProcessing.createNew(data, "best-coverage" + suffix, dirForMutations());
+
     LOG_INFO("createMutationFiles was ended successfully");
 }
 
