@@ -32,7 +32,7 @@ void Fuzzer::fuzzing(int id)
     LOG_DEBUG("Thread %d is trying access sample at corpus", id);
     mutex.lock();
     LOG_DEBUG("Thread %d access sample at corpus", id);
-    Sample sample = corpus().at(id); //TODO mozno to vytiahnut pred cyklus - vzdy to vrati kopiu
+    Sample sample = corpus().at(id);
     mutex.unlock();
 
     while(true){
@@ -62,6 +62,12 @@ void Fuzzer::fuzzing(int id)
         int newCoverage = sample.codeCoverage().coverage();
         LOG_DEBUG("Thread %d new coverage is: %d", id, newCoverage);
 
+
+        LOG_DEBUG("Thread %d is checking if target application does not crashed", id); 
+        mutex.lock();
+        sample.crashesProcessing().start(newData); //TODO musi byt coverage lepsi ked sposobi crash alebo natom nezalezi 
+        mutex.unlock();
+
         if(newCoverage > previousCoverage)
         {
             LOG_DEBUG("Thread %d: new coverage %d is larger than previous coverage %d", id, newCoverage, previousCoverage);
@@ -74,7 +80,6 @@ void Fuzzer::fuzzing(int id)
                 BEST_COVERAGE.store(newCoverage); 
                 LOG_DEBUG("Thread %d setting BEST_COVERAGE ended successfully", id);
 
-                //todo ziskaj priponu suboru 
                 LOG_DEBUG("Thread %d start updating best-coverage file", id);
                 sample.sampleProcessing().createNew(newData, "best-coverage" + suffix, sample.mutation().dirForMutations());
                 mutex.unlock();

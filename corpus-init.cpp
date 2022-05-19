@@ -162,14 +162,24 @@ void CorpusInit::createMutationFiles(int count, SampleProcessing sampleProcessin
 {
     LOG_INFO("Start of createMutationFiles");
     std::string data;
+    std::string suffix;
 
     for(int i = 0; i < count; i++)
     {
         data = sampleProcessing.getBytes(listOfFiles.at(i), argv()[1]);
         sampleProcessing.createNew(data, listOfFiles.at(i), dirForMutations());
     }
+    int posOfDot = istOfFiles.at(0).find(".");
 
-    std::string suffix = listOfFiles.at(0).substr(listOfFiles.at(0).find(".")); //TODO oprav nie vzdy mas BODKU!
+    if(posOfDot == -1)
+    {
+        suffix = "";
+    }
+    else
+    {
+        suffix = listOfFiles.at(0).substr(listOfFiles.at(0).find("."));
+    }
+
     sampleProcessing.createNew(data, "best-coverage" + suffix, dirForMutations());
 
     LOG_INFO("createMutationFiles was ended successfully");
@@ -204,7 +214,7 @@ std::vector<Sample> CorpusInit::createNew()
         LOG_DEBUG("Sample is initializing");
         SampleProcessing sampleProcessing;
         Mutation mutation(dirForMutations());
-        CrashesProcessing crashesProcessing(dirForCrashes());
+        CrashesProcessing crashesProcessing(dirForCrashes(), argv(), argc(), dirForMutations() + "/" + fileNames.at(i));
         CodeCoverage codeCoverage(dirForMutations() + "/" + fileNames.at(i), argv(), argc());
         Sample sample(sampleProcessing, codeCoverage, fileNames.at(i), crashesProcessing, mutation);
         
