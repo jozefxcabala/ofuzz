@@ -27,25 +27,32 @@ std::vector<Sample>& Fuzzer::corpus()
 
 void Fuzzer::fuzzing(int id)
 {
+    std::string suffix = corpus().at(id).fileName().substr(corpus().at(id).fileName().find("."));
     LOG_INFO("Thread %d was created and fuzzing by these thread was started", id);
-    while(true){
-        LOG_DEBUG("Thread %d is trying access sample at corpus", id);
-        mutex.lock();
-        LOG_DEBUG("Thread %d access sample at corpus", id);
-        Sample sample = corpus().at(id);
-        mutex.unlock();
+    LOG_DEBUG("Thread %d is trying access sample at corpus", id);
+    mutex.lock();
+    LOG_DEBUG("Thread %d access sample at corpus", id);
+    Sample sample = corpus().at(id); //TODO mozno to vytiahnut pred cyklus - vzdy to vrati kopiu
+    mutex.unlock();
 
-        LOG_DEBUG("Thread %d is trying to get previous data", id);
-        std::string previousData = sample.sampleProcessing().getBytes(sample.fileName(), sample.mutation().dirForMutations()); //TODO zmen to umiestnenie dirName // TU JE TIEZ CHYBA NACITA 0 BYTESinfo 
+    while(true){
+        LOG_DEBUG("Thread %d is trying to get data with best coverage", id);
+        mutex.lock();
+        std::string previousData = sample.sampleProcessing().getBytes("best-coverage" + suffix, sample.mutation().dirForMutations());
+        mutex.unlock();
+        LOG_DEBUG("Thread %d got data with best coverage successfully", id);
+  
+
         LOG_DEBUG("Thread %d is trying to get previous coverage", id);
         int previousCoverage = sample.codeCoverage().coverage();
         LOG_DEBUG("Thread %d previous coverage is: %d", id, previousCoverage);
 
         LOG_DEBUG("Thread %d is trying to mutate data", id);
-        std::string newData = sample.mutation().start(0, previousData);
+        //std::string newData = sample.mutation().start(0, previousData);
+        std::string newData = previousData;
 
         LOG_DEBUG("Thread %d is trying to create rewrite data in orignal file", id);
-        sample.sampleProcessing().createNew(newData, "thread-" + std::to_string(id) + "-" + sample.fileName(), sample.mutation().dirForMutations()); //TODO dopln thread do debugov a filenames
+        sample.sampleProcessing().createNew(newData, sample.fileName(), sample.mutation().dirForMutations()); //TODO dopln thread do debugov a filenames
 
         LOG_DEBUG("Thread %d is trying to calculate new code coverage", id);
         mutex.lock();
@@ -60,15 +67,19 @@ void Fuzzer::fuzzing(int id)
             LOG_DEBUG("Thread %d: new coverage %d is larger than previous coverage %d", id, newCoverage, previousCoverage);
             if(newCoverage > BEST_COVERAGE.load())
             {
-                LOG_INFO("Thread %d: we got new best coverage (%d), i am saving it and sending to others thread (TO DO)", id, newCoverage);
+                LOG_INFO("Thread %d: we got new best coverage (%d), i am saving it and sending to others thread", id, newCoverage);
+
+                LOG_DEBUG("Thread %d start setting BEST_COVERAGE", id);
+                mutex.lock();
                 BEST_COVERAGE.store(newCoverage); 
-                //TODO distribucia najlepsej SAMPLE
+                LOG_DEBUG("Thread %d setting BEST_COVERAGE ended successfully", id);
+
+                //todo ziskaj priponu suboru 
+                LOG_DEBUG("Thread %d start updating best-coverage file", id);
+                sample.sampleProcessing().createNew(newData, "best-coverage" + suffix, sample.mutation().dirForMutations());
+                mutex.unlock();
+                LOG_DEBUG("Thread %d updating best-coverage file ended successfully", id);
             }
-        }
-        else
-        {
-            LOG_DEBUG("Thread %d: new coverage %d is lower than previous coverage %d, rewrite file back to original state", id, newCoverage, previousCoverage);
-            sample.sampleProcessing().createNew(previousData, "thread-" + std::to_string(id) + "-" + sample.fileName(), sample.codeCoverage().argv()[2]); //TODO zmen to umiestnenie dirName
         }
     }
 }
@@ -102,6 +113,9 @@ void Fuzzer::start()
     LOG_INFO("Fuzzing ended successfully");
 
     // TODO toto sprav v crash handling
+    // TODO krajsi vypis v konzole (farbicky pridaj pre kazdu thread)
+
+
     // auto stop = std::chrono::high_resolution_clock::now();
     // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     // std::cout << "execution time: " << duration.count() << "ms" << std::endl;
