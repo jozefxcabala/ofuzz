@@ -14,14 +14,14 @@
 
 std::string CrashesProcessing::getDate()
 {
-    LOG_INFO("Getting timestamp");
+    LOG_INFO(6, "Getting timestamp");
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
 
     std::ostringstream oss;
     oss << std::put_time(&tm, "%d-%m-%Y-%H-%M-%S");
 
-    LOG_INFO("Timestamp: %s was got successfully", oss.str().c_str());
+    LOG_INFO(6, "Timestamp: %s was got successfully", oss.str().c_str());
 
     return oss.str();
 }
@@ -51,7 +51,7 @@ CrashesProcessing::CrashesProcessing(std::string dirForCrashFiles, char** argv, 
 void CrashesProcessing::createNew(std::string data, std::string fileName)
 {
 	std::string fullName = dirForCrashFiles() + "/" + fileName;
-	LOG_INFO("Start of new %s crash creating", fullName.c_str());
+	LOG_INFO(6, "Start of new %s crash creating", fullName.c_str());
 	std::ofstream fout(fullName, std::ios::binary);
 
 	if (fout.is_open())
@@ -60,14 +60,14 @@ void CrashesProcessing::createNew(std::string data, std::string fileName)
 		size_t previousPos = fout.tellp();
 		fout.write(&data[0], data.size());
 		size_t writtenBytes = fout.tellp() - previousPos; 
-		LOG_DEBUG("%d bytes from %d was written", writtenBytes, data.size());
+		LOG_DEBUG(6, "%d bytes from %d was written", writtenBytes, data.size());
 	}
 	else
 	{
-		LOG_ERROR("Failed to create %s", fullName.c_str());
+		LOG_ERROR(6, "Failed to create %s", fullName.c_str());
 		exit(EXIT_FAILURE);
 	}
-	LOG_INFO("Crash was created successfully");
+	LOG_INFO(6, "Crash was created successfully");
 }
 
 std::string CrashesProcessing::getOutput()
@@ -78,9 +78,9 @@ std::string CrashesProcessing::getOutput()
 	std::string cmd = "./";
 	std::string targetApplication(argv()[2]);
 
-	LOG_INFO("Start of getting output from target application: %s", targetApplication.c_str());
+	LOG_INFO(6, "Start of getting output from target application: %s", targetApplication.c_str());
 
-	LOG_DEBUG("Start of build cmd for run target application: %s", targetApplication.c_str());
+	LOG_DEBUG(6, "Start of build cmd for run target application: %s", targetApplication.c_str());
 	cmd.append(targetApplication);
 	cmd.append(" ");
 
@@ -96,36 +96,36 @@ std::string CrashesProcessing::getOutput()
 	} 
 	else
 	{
-		LOG_ERROR("Not supported number of arguments");
+		LOG_ERROR(6, "Not supported number of arguments");
         exit(EXIT_FAILURE);
 	}
 
-	LOG_DEBUG("Build of cmd for run target application: %s, ended successfully. cmd:  %s", targetApplication.c_str(), cmd.c_str());
+	LOG_DEBUG(6, "Build of cmd for run target application: %s, ended successfully. cmd:  %s", targetApplication.c_str(), cmd.c_str());
  
-	LOG_DEBUG("Star of running target application: %s, with potential crashable input file", targetApplication.c_str());
+	LOG_DEBUG(6, "Star of running target application: %s, with potential crashable input file", targetApplication.c_str());
 	std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
     if (!pipe) 
 	{
-		LOG_ERROR("Pipe is null");
+		LOG_ERROR(6, "Pipe is null");
         exit(EXIT_FAILURE);
     }
-	LOG_DEBUG("Running of target application: %s, with potential crashable input file ended successfully", targetApplication.c_str());
+	LOG_DEBUG(6, "Running of target application: %s, with potential crashable input file ended successfully", targetApplication.c_str());
 
-	LOG_DEBUG("Start of building output from target application: %s", targetApplication.c_str());
+	LOG_DEBUG(6, "Start of building output from target application: %s", targetApplication.c_str());
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
         output += buffer.data();
     }
-	LOG_DEBUG("Build of output from target application: %s, ended successfully", targetApplication.c_str());
+	LOG_DEBUG(6, "Build of output from target application: %s, ended successfully", targetApplication.c_str());
 
 	output = "Segmentation"; // TODO toto tu je preto lebo inak to nefunguje, popros peta nech nato pozrie
 
-	LOG_INFO("Getting output from target application: %s, ended successfully", targetApplication.c_str());
+	LOG_INFO(6, "Getting output from target application: %s, ended successfully", targetApplication.c_str());
     return output;
 }
 
 void CrashesProcessing::checkForCrash(std::string output, std::string data)
 {
-	LOG_INFO("Start of checking for potential crash");
+	LOG_INFO(6, "Start of checking for potential crash");
 	std::string segfault = "Segmentation";
 	std::string floating_point = "Floating";
 
@@ -136,24 +136,24 @@ void CrashesProcessing::checkForCrash(std::string output, std::string data)
 
 	if (pos1 != -1)
 	{
-		LOG_DEBUG("There is segmentation fault!");
+		LOG_DEBUG(6, "There is segmentation fault!");
 		createNew(data, "segmentation-fault-" + getDate() + "-" + suffix);
 	}
 	else if (pos2 != -1)
 	{
-		LOG_DEBUG("There is floating point fault!");
+		LOG_DEBUG(6, "There is floating point fault!");
 		createNew(data, "floating-point-" + getDate() + "-" + suffix);
 	}
 
-	LOG_INFO("Checking for potential crash ended successfully");
+	LOG_INFO(6, "Checking for potential crash ended successfully");
 }
 
 void CrashesProcessing::start(std::string data)
 {
-	LOG_INFO("Start of crash processing");
+	LOG_INFO(6, "Start of crash processing");
 	std::string output = getOutput();
 	checkForCrash(output, data);
-	LOG_INFO("Crash processing ended successfully");
+	LOG_INFO(6, "Crash processing ended successfully");
 }
 
 void CrashesProcessing::setArgv(char** argv)

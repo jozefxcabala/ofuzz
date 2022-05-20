@@ -3,9 +3,9 @@
 
 #include <stdio.h>
 #include <mutex>
+#include <vector>
 #include <ctime>
 #include <assert.h>
-
 
 enum LogPriority
 {
@@ -18,45 +18,56 @@ class Logger
 	std::mutex logMutex_;
 
 	public:
+		std::vector<std::string> Colour{
+			"\x1b[31m",
+			"\x1b[32m",
+			"\x1b[33m",
+			"\x1b[34m",
+			"\x1b[35m",
+			"\x1b[36m",
+			"\x1b[0m"
+		};
+
+	public:
 		static void SetPriority(LogPriority newPriority)
 		{
 			instance().priority_ = newPriority;
 		}
 
 		template<typename... Args>
-		static void Trace(int line, const char* sourceFile, const char* message, Args... args)
+		static void Trace(int line, const char* sourceFile, int id,  const char* message, Args... args)
 		{
-			instance().log(line, sourceFile, "[Trace]\t", TracePriority, message, args...);
+			instance().log(line, sourceFile, "[Trace]\t", TracePriority, id, message, args...);
 		}
 
 		template<typename... Args>
-		static void Debug(int line, const char* sourceFile, const char* message, Args... args)
+		static void Debug(int line, const char* sourceFile, int id,  const char* message, Args... args)
 		{
-			instance().log(line, sourceFile, "[Debug]\t", DebugPriority, message, args...);
+			instance().log(line, sourceFile, "[Debug]\t", DebugPriority, id, message, args...);
 		}
 
 		template<typename... Args>
-		static void Info(int line, const char* sourceFile, const char* message, Args... args)
+		static void Info(int line, const char* sourceFile, int id,  const char* message, Args... args)
 		{
-			instance().log(line, sourceFile, "[Info]\t", InfoPriority, message, args...);
+			instance().log(line, sourceFile, "[Info]\t", InfoPriority, id, message, args...);
 		}
 
 		template<typename... Args>
-		static void Warn(int line, const char* sourceFile, const char* message, Args... args)
+		static void Warn(int line, const char* sourceFile, int id,  const char* message, Args... args)
 		{
-			instance().log(line, sourceFile, "[Warn]\t", WarnPriority, message, args...);
+			instance().log(line, sourceFile, "[Warn]\t", WarnPriority, id, message, args...);
 		}
 
 		template<typename... Args>
-		static void Error(int line, const char* sourceFile, const char* message, Args... args)
+		static void Error(int line, const char* sourceFile, int id, const char* message, Args... args)
 		{
-			instance().log(line, sourceFile, "[Error]\t", ErrorPriority, message, args...);
+			instance().log(line, sourceFile, "[Error]\t", ErrorPriority, id, message, args...);
 		}
 
 		template<typename... Args>
-		static void Critical(int line, const char* sourceFile, const char* message, Args... args)
+		static void Critical(int line, const char* sourceFile, int id, const char* message, Args... args)
 		{
-			instance().log(line, sourceFile, "[Critical]\t", CriticalPriority, message, args...);
+			instance().log(line, sourceFile, "[Critical]\t", CriticalPriority, id, message, args...);
 		}
 
 	private:
@@ -74,7 +85,7 @@ class Logger
 		}
 
 		template<typename... Args>
-		void log(int lineNumber, const char* sourceFile, const char* messagePriorityStr, LogPriority messagePriority, const char* message, Args... args)
+		void log(int lineNumber, const char* sourceFile, const char* messagePriorityStr, LogPriority messagePriority, int id, const char* message, Args... args)
 		{
 			if (priority_ <= messagePriority)
 			{
@@ -84,22 +95,24 @@ class Logger
 				strftime(buffer, 80, "%c", timestamp);
 
 				std::scoped_lock lock(logMutex_);
+				printf("%s", Colour[id % 7].c_str());
 				printf("%s\t", buffer);
 				printf("%s", messagePriorityStr);
 				printf(message, args...);
 				printf(" on line %d in %s", lineNumber, sourceFile);
 				printf("\n");
+				printf("%s", Colour[6].c_str());
 			}
 		}
 };
 
 
-#define LOG_TRACE(Message, ...) (Logger::Trace(__LINE__, __FILE__, Message, ## __VA_ARGS__))
-#define LOG_DEBUG(Message, ...) (Logger::Debug(__LINE__, __FILE__, Message, ## __VA_ARGS__))
-#define LOG_INFO(Message, ...) (Logger::Info(__LINE__, __FILE__, Message, ## __VA_ARGS__))
-#define LOG_WARN(Message, ...) (Logger::Warn(__LINE__, __FILE__, Message, ## __VA_ARGS__))
-#define LOG_ERROR(Message, ...) (Logger::Error(__LINE__, __FILE__, Message, ## __VA_ARGS__))
-#define LOG_CRITICAL(Message, ...) (Logger::Critical(__LINE__, __FILE__, Message, ## __VA_ARGS__))
+#define LOG_TRACE(Id, Message, ...) (Logger::Trace(__LINE__, __FILE__,  Id,  Message, ## __VA_ARGS__))
+#define LOG_DEBUG(Id, Message, ...) (Logger::Debug(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
+#define LOG_INFO(Id, Message, ...) (Logger::Info(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
+#define LOG_WARN(Id, Message, ...) (Logger::Warn(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
+#define LOG_ERROR(Id, Message, ...) (Logger::Error(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
+#define LOG_CRITICAL(Id, Message, ...) (Logger::Critical(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
 
 #endif // LOGGER_H
 

@@ -31,22 +31,22 @@ std::string BinaryFileInstrumentation::targetApplication()
 
 void BinaryFileInstrumentation::runE9PatchTool()
 {
-    LOG_INFO("E9PatchTool was started");
+    LOG_INFO(6, "E9PatchTool was started");
     int childPid;
 
     switch(childPid = fork())
     {
         case -1:
         {
-            LOG_ERROR("The following fork() error occurred: %s", std::strerror(errno));
+            LOG_ERROR(6, "The following fork() error occurred: %s", std::strerror(errno));
             exit(EXIT_FAILURE);
         }
         case 0:
         {
-            LOG_INFO("Start of instrumentation");
+            LOG_INFO(6, "Start of instrumentation");
             if(execl("./e9patch/e9tool", "./e9patch/e9tool", "-M", "asm=/j.*/", "-P", "entry(addr)@instrumentation.out", targetApplication().c_str(), (char*) NULL) == -1)
             {
-                LOG_ERROR("The following ""./e9patch/e9tool"", ""./e9patch/e9tool"", ""-M"", ""asm=/j.*/"", ""-P"", ""entry(addr)@instrumentation.out"", ""%s"", (char*) NULL) error occurred", targetApplication().c_str());
+                LOG_ERROR(6, "The following ""./e9patch/e9tool"", ""./e9patch/e9tool"", ""-M"", ""asm=/j.*/"", ""-P"", ""entry(addr)@instrumentation.out"", ""%s"", (char*) NULL) error occurred", targetApplication().c_str());
                 exit(EXIT_FAILURE);
             }
         }
@@ -57,20 +57,20 @@ void BinaryFileInstrumentation::runE9PatchTool()
 
             if (returnStatus == 1)      
             {
-                LOG_ERROR("The child process (binary instrumentation) terminated with an error: %s", std::strerror(errno));
+                LOG_ERROR(6, "The child process (binary instrumentation) terminated with an error: %s", std::strerror(errno));
                 exit(EXIT_FAILURE);
             }
-            LOG_INFO("Instrumentation ended successfully");
+            LOG_INFO(6, "Instrumentation ended successfully");
         }
     }
 
-    LOG_INFO("E9PatchTool ended successfully");
+    LOG_INFO(6, "E9PatchTool ended successfully");
 }
 
 void BinaryFileInstrumentation::start()
 {
-    LOG_INFO("Start binary file instrumentation");
+    LOG_INFO(6, "Start binary file instrumentation");
     runE9PatchTool();
-    LOG_INFO("Binary file instrumentation ended successfully");
+    LOG_INFO(6, "Binary file instrumentation ended successfully");
 }
 
