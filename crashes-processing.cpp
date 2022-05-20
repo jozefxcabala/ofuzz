@@ -128,7 +128,7 @@ std::string CrashesProcessing::getOutput()
     }
 	LOG_DEBUG(id(), "Build of output from target application: %s, ended successfully", targetApplication.c_str());
 
-	output = "Segmentation"; // TODO toto tu je preto lebo inak to nefunguje, popros peta nech nato pozrie
+	//output = "Segmentation"; // TODO toto tu je preto lebo inak to nefunguje, popros peta nech nato pozrie
 
 	LOG_INFO(id(), "Getting output from target application: %s, ended successfully", targetApplication.c_str());
     return output;
