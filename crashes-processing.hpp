@@ -9,10 +9,11 @@ class CrashesProcessing
     std::string inputFile_;
     char** argv_;
     int argc_;
+    int id_;
 
     public:
         CrashesProcessing();
-        CrashesProcessing(std::string dirForCrashFiles, char** argv, int argc, std::string inputFile);
+        CrashesProcessing(std::string dirForCrashFiles, char** argv, int argc, std::string inputFile, int id);
 
         void createNew(std::string data, std::string fileName);
 
@@ -20,11 +21,13 @@ class CrashesProcessing
         void setArgv(char** argv);
         void setArgc(int argc);
         void setDirForCrashFiles(std::string dirForCrashFiles);
+        void setId(int id);
         
         std::string inputFile();
         char** argv();
         int argc();
         std::string dirForCrashFiles();
+        int id();
 
         void start(std::string data);
 

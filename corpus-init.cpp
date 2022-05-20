@@ -190,7 +190,7 @@ std::vector<Sample> CorpusInit::createNew()
     LOG_INFO(6, "Start of createNew function to create corpus for fuzzer");
     std::vector<Sample> result;
     std::vector<std::string> fileNames = getListOfFiles();
-    SampleProcessing sampleProcessingForInit;
+    SampleProcessing sampleProcessingForInit(6);
         
     if(fileNames.size() == 0)
     {
@@ -212,10 +212,10 @@ std::vector<Sample> CorpusInit::createNew()
     for(int i = 0; i < sizeOfCorpus(); i++)
     {
         LOG_DEBUG(6, "Sample is initializing");
-        SampleProcessing sampleProcessing;
-        Mutation mutation(dirForMutations());
-        CrashesProcessing crashesProcessing(dirForCrashes(), argv(), argc(), dirForMutations() + "/" + fileNames.at(i));
-        CodeCoverage codeCoverage(dirForMutations() + "/" + fileNames.at(i), argv(), argc());
+        SampleProcessing sampleProcessing(i);
+        Mutation mutation(dirForMutations(), i);
+        CrashesProcessing crashesProcessing(dirForCrashes(), argv(), argc(), dirForMutations() + "/" + fileNames.at(i), i);
+        CodeCoverage codeCoverage(dirForMutations() + "/" + fileNames.at(i), argv(), argc(), i);
         Sample sample(sampleProcessing, codeCoverage, fileNames.at(i), crashesProcessing, mutation);
         
         LOG_DEBUG(6, "Sample of file %s, is pushing to vector", sample.fileName().c_str());

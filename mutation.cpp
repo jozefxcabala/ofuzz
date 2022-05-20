@@ -2,13 +2,24 @@
 #include <iostream>
 #include "logger.hpp"
 
+void Mutation::setId(int id)
+{
+	id_ = id;
+}
+
+int Mutation::id()
+{
+	return id_;
+}
+
 Mutation::Mutation()
 {
 }
 
-Mutation::Mutation(std::string dirForMutationsA)
+Mutation::Mutation(std::string dirForMutationsA, int id)
 {
 	setDirForMutations(dirForMutationsA);
+	setId(id);
 }
 
 std::vector<std::string> Mutation::magicVector()
@@ -33,7 +44,7 @@ void Mutation::setDirForMutations(std::string dirForMutations)
 
 std::string Mutation::bitFlip(std::string data)
 {
-	LOG_INFO(6, "Start of bitFlip method of mutation");
+	LOG_INFO(id(), "Start of bitFlip method of mutation");
 	int size = (data.length());
 	int numOfFlips = (int)(size * .01);
 
@@ -42,10 +53,10 @@ std::string Mutation::bitFlip(std::string data)
 		numOfFlips = 1;
 	}
 
-	LOG_DEBUG(6, "%d flips will be do", numOfFlips);
+	LOG_DEBUG(id(), "%d flips will be do", numOfFlips);
 
 	// get a vector full of 1% of random byte indexes
-	LOG_DEBUG(6, "Start of picking indexes");
+	LOG_DEBUG(id(), "Start of picking indexes");
 	std::vector<int> pickedIndexes;
 	for (int i = 0; i < numOfFlips; i++)
 	{
@@ -62,10 +73,10 @@ std::string Mutation::bitFlip(std::string data)
 		pickedIndexes.push_back(pickedIndex);
 	}
 
-	LOG_DEBUG(6, "indexes was picked successfully");
+	LOG_DEBUG(id(), "indexes was picked successfully");
 
 	// iterate through the data string at those indexes and flip a bit
-	LOG_DEBUG(6, "Star of bit flipping");
+	LOG_DEBUG(id(), "Star of bit flipping");
 	for (int i = 0; i < pickedIndexes.size(); ++i)
 	{
 		int index = pickedIndexes[i];
@@ -79,9 +90,9 @@ std::string Mutation::bitFlip(std::string data)
 		
 		data[index] = (char)decimal;
 	}
-	LOG_DEBUG(6, "Bit flipping ended successfully");
+	LOG_DEBUG(id(), "Bit flipping ended successfully");
 
-	LOG_INFO(6, "BitFlip method of mutation ended successfully");
+	LOG_INFO(id(), "BitFlip method of mutation ended successfully");
 
 	return data;
 
@@ -89,7 +100,7 @@ std::string Mutation::bitFlip(std::string data)
 
 std::vector<std::string> Mutation::vectorGen()
 {
-	LOG_INFO(6, "Start of generating vector of magic numbers");
+	LOG_INFO(id(), "Start of generating vector of magic numbers");
 	std::vector<std::string> magic;
 
 	using namespace std::string_literals;
@@ -105,42 +116,42 @@ std::vector<std::string> Mutation::vectorGen()
 	magic.push_back("\x40\x00\x00\x00"s);
 	magic.push_back("\x7f\xff\xff\xff");
 
-	LOG_INFO(6, "Vector of magic numbers was generated successfully");
+	LOG_INFO(id(), "Vector of magic numbers was generated successfully");
 
 	return magic;
 }
 
 std::string Mutation::magic(std::string data, std::vector<std::string> magic)
 {
-	LOG_INFO(6, "Start of magic method of bytes mutation");
+	LOG_INFO(id(), "Start of magic method of bytes mutation");
 	int vectorSize = magic.size();
-	LOG_DEBUG(6, "Size of vector with magic values: %d", vectorSize);
+	LOG_DEBUG(id(), "Size of vector with magic values: %d", vectorSize);
 	int pickedMagicIndex = rand() % vectorSize;
-	LOG_DEBUG(6, "Picked magic index: %d", pickedMagicIndex);
+	LOG_DEBUG(id(), "Picked magic index: %d", pickedMagicIndex);
 	std::string pickedMagic = magic[pickedMagicIndex];
-	LOG_DEBUG(6, "picked magic value: %s", pickedMagic.c_str());
+	LOG_DEBUG(id(), "picked magic value: %s", pickedMagic.c_str());
 	int size = (data.length());
-	LOG_DEBUG(6, "Size of data: %d", size);
+	LOG_DEBUG(id(), "Size of data: %d", size);
 	int pickedDataIndex = rand() % size;
 	data.replace(pickedDataIndex, magic[pickedMagicIndex].length(), magic[pickedMagicIndex]);
 
-	LOG_INFO(6, "Magic method of bytes mutation ended successfully");
+	LOG_INFO(id(), "Magic method of bytes mutation ended successfully");
 
 	return data;
 }
 
 int Mutation::pick()
 {
-	LOG_INFO(6, "Start of pick mutation method");
+	LOG_INFO(id(), "Start of pick mutation method");
 	int result = rand() % 2;
-	LOG_INFO(6, "%d method was picked successfully", result);
+	LOG_INFO(id(), "%d method was picked successfully", result);
 
 	return result;
 }
 
 std::string Mutation::start(int method, std::string data)
 {
-	LOG_INFO(6, "Start of mutation");
+	LOG_INFO(id(), "Start of mutation");
     std::string mutated;
     int function;
 
@@ -171,7 +182,7 @@ std::string Mutation::start(int method, std::string data)
         mutated = bitFlip(data);
     }
 
-	LOG_INFO(6, "Mutation ended successfully");
+	LOG_INFO(id(), "Mutation ended successfully");
 
     return mutated;
 }

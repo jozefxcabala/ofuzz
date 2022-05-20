@@ -12,22 +12,25 @@ class CodeCoverage
     std::string inputFile_;
     char** argv_;
     int argc_;
+    int id_;
 
     public:
         CodeCoverage();
-        CodeCoverage(std::string inputFile, char** argvA, int argcA);
+        CodeCoverage(std::string inputFile, char** argvA, int argcA, int id);
 
         void setCoverage(int coverage);
         void setData(std::vector<uint64_t> data);
         void setInputFile(std::string inputFile);
         void setArgv(char** argv);
         void setArgc(int argc);
+        void setId(int id);
         
         std::vector<uint64_t> data();  
         std::string inputFile();  
         int coverage();
         char** argv();
         int argc();
+        int id();
 
         void start();
         void printData();
