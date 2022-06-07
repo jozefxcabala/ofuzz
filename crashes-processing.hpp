@@ -32,9 +32,8 @@ class CrashesProcessing
         void start(std::string data);
 
     private:
-        std::string getOutput();
-        void checkForCrash(std::string output, std::string data);
         std::string getDate();
+        void checkForCrash(std::string data);
 };
 
 #endif // CRASHES_PROCESSING_H
