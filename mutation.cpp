@@ -1,6 +1,7 @@
 #include "mutation.hpp"
 #include <iostream>
 #include "logger.hpp"
+#include "time.h"
 
 void Mutation::setId(int id)
 {
@@ -151,6 +152,7 @@ int Mutation::pick()
 
 std::string Mutation::start(int method, std::string data)
 {
+	srand ( time(NULL) );
 	LOG_INFO(id(), "Start of mutation");
     std::string mutated;
     int function;
