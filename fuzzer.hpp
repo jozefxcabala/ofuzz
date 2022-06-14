@@ -4,12 +4,15 @@
 #include <mutex>
 #include <signal.h>
 #include "sample.hpp"
+#include <string>
+#include <chrono>
 
 #ifndef FUZZER_H
 #define FUZZER_H
 
 static std::atomic<int> BEST_COVERAGE;
 static std::atomic<int> ITERATION;
+static std::atomic<int> CRASHES;
 static std::mutex mutex;
 
 class Fuzzer 
@@ -24,10 +27,10 @@ class Fuzzer
 
         void setCorpus(std::vector<Sample> corpus);
 
-        void start();
+        void start(std::string target);
 
     private:
-        void fuzzing(int id);
+        void fuzzing(int id, std::string target, std::chrono::time_point<std::chrono::high_resolution_clock> start);
 
 };
 

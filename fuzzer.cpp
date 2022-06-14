@@ -4,6 +4,38 @@
 #include <thread>
 #include <functional>
 #include "logger.hpp"
+#include "cstdio"
+#include <unistd.h>
+
+void menu(int size, std::string target, std::chrono::time_point<std::chrono::high_resolution_clock> start)
+{
+    auto end = std::chrono::high_resolution_clock::now();
+    auto durationInSeconds = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+    double iteration = ITERATION.load();
+
+    system("clear");
+
+    if(iteration != 0 && durationInSeconds.count() != 0)
+    {
+        int day = durationInSeconds.count() / 86400.0;
+        int hour = durationInSeconds.count() / 3600.0;
+        int minutes = durationInSeconds.count() / 60.0;
+        int seconds = durationInSeconds.count();
+
+        printf(
+        ".........................[ %03d days %02d hours %02d minutes %02d seconds ]........................\nIterations  : %d\nSpeed       : %d/sec\nCrashes     : %d\nCorpus Size : %d\nCoverage    : %d\nTarget      : %s\n............................................................................................\n",
+        day % 365, hour % 24, minutes % 60, seconds % 60, ITERATION.load(), (int)(iteration / durationInSeconds.count()), CRASHES.load(), size, BEST_COVERAGE.load(), target.c_str());
+
+    } else
+    {
+        printf(
+        ".........................[ %03d days %02d hours %02d minutes %02d seconds ]........................\nIterations  : %d\nSpeed       : %d/sec\nCrashes     : %d\nCorpus Size : %d\nCoverage    : %d\nTarget      : %s\n............................................................................................\n",
+        0, 0, 0, 0, ITERATION.load(), 0, CRASHES.load(), size, BEST_COVERAGE.load(), target.c_str());
+    }
+        
+
+    
+}
 
 Fuzzer::Fuzzer()
 {
@@ -25,10 +57,9 @@ std::vector<Sample>& Fuzzer::corpus()
     return corups_;
 }
 
-void Fuzzer::fuzzing(int id)
+void Fuzzer::fuzzing(int id, std::string target, std::chrono::time_point<std::chrono::high_resolution_clock> start)
 {
     bool firstIteration = true;
-    std::string suffix = corpus().at(id).fileName().substr(corpus().at(id).fileName().find("."));
     LOG_INFO(id, "Thread %d was created and fuzzing by these thread was started", id);
     LOG_DEBUG(id, "Thread %d is trying access sample at corpus", id);
     mutex.lock();
@@ -40,15 +71,13 @@ void Fuzzer::fuzzing(int id)
 
     while(true){
         //todo create some GUI, tu sa bude volat nejaka funkcia, ktora bude zobrazovat data o aplikacii + dole sa bude vypisovat ak vznikne nejaky crash
-        system("clear");
+        menu(5, target, start);
         ITERATION.store(ITERATION.load() + 1);
-        LOG_APP(6, "Iteration: %d", ITERATION.load());
-        LOG_APP(6, "BestCoverage is %d", BEST_COVERAGE.load());
         std::string previousData;
         LOG_DEBUG(id, "Thread %d is trying to get data with best coverage", id);
         mutex.lock();
 
-        if(firstIteration || counter < 50)
+        if(firstIteration || counter < 100)
         {
             previousData = sample.sampleProcessing().getBytes(sample.fileName(), sample.mutation().dirForMutations());
             firstIteration = false;
@@ -84,7 +113,10 @@ void Fuzzer::fuzzing(int id)
 
         LOG_DEBUG(id, "Thread %d is checking if target application does not crashed", id); 
         mutex.lock();
-        sample.crashesProcessing().start(newData); //TODO musi byt coverage lepsi ked sposobi crash alebo natom nezalezi 
+        if(sample.crashesProcessing().start(newData))
+        {
+            CRASHES.store(CRASHES.load() + 1);
+        }
         mutex.unlock();
 
         if(newCoverage > previousCoverage)
@@ -108,7 +140,7 @@ void Fuzzer::fuzzing(int id)
     }
 }
 
-void Fuzzer::start()
+void Fuzzer::start(std::string target)
 {
     LOG_INFO(6, "Start of fuzzing");
     auto start = std::chrono::high_resolution_clock::now();
@@ -119,13 +151,16 @@ void Fuzzer::start()
     LOG_DEBUG(6, "ITERATION is setting to 0");
     ITERATION.store(0);
 
+    LOG_DEBUG(6, "CRASHES is setting to 0");
+    CRASHES.store(0);
+
     std::thread threads[corpus().size()];
 
     LOG_DEBUG(6, "Start of creating threads, count: %d", corpus().size());
     for(int i = 0; i < corpus().size(); i++)
     {
         LOG_DEBUG(6, "Thread %d is going to be create", i);
-        threads[i] = std::thread(&Fuzzer::fuzzing, this, i);
+        threads[i] = std::thread(&Fuzzer::fuzzing, this, i, target, start);
     }
 
     LOG_DEBUG(6, "Start of joining threads");
@@ -137,32 +172,5 @@ void Fuzzer::start()
     }
 
     LOG_INFO(6, "Fuzzing ended successfully");
-
-    // TODO toto sprav v crash handling
-    // TODO krajsi vypis v konzole (farbicky pridaj pre kazdu thread)
-
-
-    // auto stop = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    // std::cout << "execution time: " << duration.count() << "ms" << std::endl;
 }
-
-/***
- * 1. spustenie
- *  vypocitaj code coverage
- * 2. - posledne spusteni
- *  nacitanie dat
- *  mutacia
- *  code coverage
- *  vyhodnotenie, ci je code coverage lepsi ako ten predtym v danej sample
- *      ak je lepsi, nechaj
- *      ak nie je lepsi, zahod mutaciu
- *  vyhodnoteniel ci je code coverage najlepsi celkovo
- *      ak je zamkni vsetko a odomknutu nechaj len thread, ktora ma najlepsi code coverage, ten uloz a rozposli ostatnym
- *      ak nie je nerob nic
- *  ak nastane pad programu, ulozh crash
- * 
- * mal by si mat samlples ulozene v niecom inom ako queue
- ***/
-
 

@@ -9,12 +9,12 @@
 
 enum LogPriority
 {
-	TracePriority, DebugPriority, InfoPriority, WarnPriority, ErrorPriority, CriticalPriority, AppPriority
+	TracePriority, DebugPriority, InfoPriority, WarnPriority, ErrorPriority, CriticalPriority, CrashPriority
 };
 
 class Logger
 {
-	LogPriority priority_ = AppPriority; 
+	LogPriority priority_ = CrashPriority; 
 	std::mutex logMutex_;
 
 	public:
@@ -71,9 +71,9 @@ class Logger
 		}
 
 		template<typename... Args>
-		static void App(int line, const char* sourceFile, int id, const char* message, Args... args)
+		static void Crash(int line, const char* sourceFile, int id, const char* message, Args... args)
 		{
-			instance().log(line, sourceFile, "[App]\t", AppPriority, id, message, args...);
+			instance().log(line, sourceFile, "[Crash]\t", CrashPriority, id, message, args...);
 		}
 
 	private:
@@ -119,7 +119,7 @@ class Logger
 #define LOG_WARN(Id, Message, ...) (Logger::Warn(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
 #define LOG_ERROR(Id, Message, ...) (Logger::Error(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
 #define LOG_CRITICAL(Id, Message, ...) (Logger::Critical(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
-#define LOG_APP(Id, Message, ...) (Logger::App(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
+#define LOG_APP(Id, Message, ...) (Logger::Crash(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
 
 #endif // LOGGER_H
 
