@@ -27,6 +27,7 @@ std::vector<Sample>& Fuzzer::corpus()
 
 void Fuzzer::fuzzing(int id)
 {
+    bool firstIteration = true;
     std::string suffix = corpus().at(id).fileName().substr(corpus().at(id).fileName().find("."));
     LOG_INFO(id, "Thread %d was created and fuzzing by these thread was started", id);
     LOG_DEBUG(id, "Thread %d is trying access sample at corpus", id);
@@ -36,9 +37,19 @@ void Fuzzer::fuzzing(int id)
     mutex.unlock();
 
     while(true){
+        std::string previousData;
         LOG_DEBUG(id, "Thread %d is trying to get data with best coverage", id);
         mutex.lock();
-        std::string previousData = sample.sampleProcessing().getBytes("best-coverage" + suffix, sample.mutation().dirForMutations());
+
+        if(firstIteration)
+        {
+            previousData = sample.sampleProcessing().getBytes(sample.fileName(), sample.mutation().dirForMutations());
+            firstIteration = false;
+        } else
+        {
+            previousData = sample.sampleProcessing().getBytes("best-coverage", sample.mutation().dirForMutations());
+        }
+        
         mutex.unlock();
         LOG_DEBUG(id, "Thread %d got data with best coverage successfully", id);
   
@@ -80,7 +91,7 @@ void Fuzzer::fuzzing(int id)
                 LOG_DEBUG(id, "Thread %d setting BEST_COVERAGE ended successfully", id);
 
                 LOG_DEBUG(id, "Thread %d start updating best-coverage file", id);
-                sample.sampleProcessing().createNew(newData, "best-coverage" + suffix, sample.mutation().dirForMutations());
+                sample.sampleProcessing().createNew(newData, "best-coverage", sample.mutation().dirForMutations());
                 mutex.unlock();
                 LOG_DEBUG(id, "Thread %d updating best-coverage file ended successfully", id);
             }

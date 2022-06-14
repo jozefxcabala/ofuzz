@@ -180,7 +180,7 @@ void CorpusInit::createMutationFiles(int count, SampleProcessing sampleProcessin
         suffix = listOfFiles.at(0).substr(listOfFiles.at(0).find("."));
     }
 
-    sampleProcessing.createNew(data, "best-coverage" + suffix, dirForMutations());
+    sampleProcessing.createNew(data, "best-coverage", dirForMutations());
 
     LOG_INFO(6, "createMutationFiles was ended successfully");
 }
