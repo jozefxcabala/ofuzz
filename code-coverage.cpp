@@ -122,7 +122,6 @@ void CodeCoverage::runInstrumentedBinaryFile()
         }
         case 0:
         {
-            //redirectSTDOut(); //tuto je problem preto to nebezi, nevieme preco to funguje na jednom vlakne, ale na viacerych nie ... TODO mozes skusit vyriesit neskor 
 
             LOG_DEBUG(id(), "Run target application with %s, num of arguments is %d", inputFile().c_str(), argc());
             if(argc() == 3)
@@ -150,49 +149,12 @@ void CodeCoverage::runInstrumentedBinaryFile()
         default:
         {
             LOG_DEBUG(id(), "Waiting for end of instrumented target application");
-            // int returnStatus;    
-            // waitpid(childPid, &returnStatus, 0);  // Parent process waits here for child to terminate.
-
-            // if (returnStatus == 1)      
-            // {
-            //     LOG_ERROR("The child process (running instrumented target application) terminated with an error: %s", std::strerror(errno));
-            //     exit(EXIT_FAILURE);
-            // }
-
             LOG_DEBUG(id(), "Instrumented target application was ended successfully");
             setData(saveTheReachedBlocks());
             closeMyFifo();
         }
     }
     LOG_INFO(id(), "Run binaryInstrumentedFile ended successfully");
-}
-
-
-void CodeCoverage::redirectSTDOut()
-{
-    LOG_INFO(id(), "Start of redirecting STDOut");
-    int saveOut = dup(STDOUT_FILENO);
-
-    if(saveOut == -1)
-    {
-        LOG_ERROR(id(), "Error in dup(STDOUT_FILENO) occurred: %s", std::strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    int devNull = open("/dev/null", O_WRONLY);
-    if(devNull == -1)
-    {
-        LOG_ERROR(id(), "Error in open('/dev/null',0) occurred: %s", std::strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    int dup2Result = dup2(devNull, STDOUT_FILENO);
-    if(dup2Result == -1)
-    {
-        LOG_ERROR(id(), "Error in dup2(devNull, STDOUT_FILENO) occurred: %s", std::strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-    LOG_INFO(id(), "Redirecting STDOut ended successfully");
 }
 
 bool CodeCoverage::checkForUniqueValue(std::vector<uint64_t> data, uint64_t value)

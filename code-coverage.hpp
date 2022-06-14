@@ -38,7 +38,6 @@ class CodeCoverage
     private:
         bool checkForUniqueValue(std::vector<uint64_t> data, uint64_t value);
         void createMyFifo();
-        void redirectSTDOut();
         void runInstrumentedBinaryFile();
         void closeMyFifo();
         void calculateCoverage();    
