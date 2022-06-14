@@ -9,6 +9,7 @@
 #define FUZZER_H
 
 static std::atomic<int> BEST_COVERAGE;
+static std::atomic<int> ITERATION;
 static std::mutex mutex;
 
 class Fuzzer 

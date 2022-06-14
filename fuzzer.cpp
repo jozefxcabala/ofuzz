@@ -37,6 +37,10 @@ void Fuzzer::fuzzing(int id)
     mutex.unlock();
 
     while(true){
+        //todo create some GUI, tu sa bude volat nejaka funkcia, ktora bude zobrazovat data o aplikacii + dole sa bude vypisovat ak vznikne nejaky crash
+        system("clear");
+        ITERATION.store(ITERATION.load() + 1);
+        LOG_APP(6, "Iteration: %d", ITERATION.load());
         std::string previousData;
         LOG_DEBUG(id, "Thread %d is trying to get data with best coverage", id);
         mutex.lock();
@@ -104,9 +108,11 @@ void Fuzzer::start()
     LOG_INFO(6, "Start of fuzzing");
     auto start = std::chrono::high_resolution_clock::now();
 
-    int counter = 0;
     LOG_DEBUG(6, "BEST_COVERAGE is setting to 0");
     BEST_COVERAGE.store(0);
+
+    LOG_DEBUG(6, "ITERATION is setting to 0");
+    ITERATION.store(0);
 
     std::thread threads[corpus().size()];
 
