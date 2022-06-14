@@ -130,31 +130,7 @@ void CrashesProcessing::checkForCrash(std::string data){
 	LOG_DEBUG(id(), "Start of build cmd for run target application: %s", targetApplication.c_str());
 
     const char* file = (std::string("./") + std::string(argv()[2])).c_str();
-    // char* arg[4];
-
-	// if(argc() == 4)
-	// {
-	// 	arg[0] = file;
-	// 	arg[1] = inputFile().c_str();
-	// 	arg[2] = argv()[3];
-	// 	arg[3] = NULL;
-	// } 
-	// else if (argc() == 3) 
-	// {
-	// 	arg[0] = file;
-	// 	arg[1] = inputFile().c_str();
-	// 	arg[2] = NULL;
-	// 	arg[3] = NULL;
-	// } 
-	// else
-	// {
-	// 	LOG_ERROR(id(), "Not supported number of arguments");
-    //     exit(EXIT_FAILURE);
-	// }
-
-	// LOG_DEBUG(id(), "Build of cmd for run target application: %s, ended successfully.", targetApplication.c_str());
     
-	
 	pid_t child_pid;
     int child_status;
 
