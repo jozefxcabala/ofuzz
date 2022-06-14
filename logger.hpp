@@ -9,12 +9,12 @@
 
 enum LogPriority
 {
-	TracePriority, DebugPriority, InfoPriority, WarnPriority, ErrorPriority, CriticalPriority
+	TracePriority, DebugPriority, InfoPriority, WarnPriority, ErrorPriority, CriticalPriority, AppPriority
 };
 
 class Logger
 {
-	LogPriority priority_ = InfoPriority; 
+	LogPriority priority_ = AppPriority; 
 	std::mutex logMutex_;
 
 	public:
@@ -70,6 +70,12 @@ class Logger
 			instance().log(line, sourceFile, "[Critical]\t", CriticalPriority, id, message, args...);
 		}
 
+		template<typename... Args>
+		static void App(int line, const char* sourceFile, int id, const char* message, Args... args)
+		{
+			instance().log(line, sourceFile, "[App]\t", AppPriority, id, message, args...);
+		}
+
 	private:
 		Logger() {}
 
@@ -113,6 +119,7 @@ class Logger
 #define LOG_WARN(Id, Message, ...) (Logger::Warn(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
 #define LOG_ERROR(Id, Message, ...) (Logger::Error(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
 #define LOG_CRITICAL(Id, Message, ...) (Logger::Critical(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
+#define LOG_APP(Id, Message, ...) (Logger::App(__LINE__, __FILE__, Id,  Message, ## __VA_ARGS__))
 
 #endif // LOGGER_H
 
