@@ -48,8 +48,7 @@ void Fuzzer::fuzzing(int id)
         LOG_DEBUG(id, "Thread %d previous coverage is: %d", id, previousCoverage);
 
         LOG_DEBUG(id, "Thread %d is trying to mutate data", id);
-        //std::string newData = sample.mutation().start(0, previousData);
-        std::string newData = previousData;
+        std::string newData = sample.mutation().start(0, previousData);
 
         LOG_DEBUG(id, "Thread %d is trying to create rewrite data in orignal file", id);
         sample.sampleProcessing().createNew(newData, sample.fileName(), sample.mutation().dirForMutations()); //TODO dopln thread do debugov a filenames
