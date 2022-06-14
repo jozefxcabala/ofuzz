@@ -47,7 +47,7 @@ std::string Mutation::bitFlip(std::string data)
 {
 	LOG_INFO(id(), "Start of bitFlip method of mutation");
 	int size = (data.length());
-	int numOfFlips = (int)(size * .01);
+	int numOfFlips = (int)(size * .05);
 
 	if(numOfFlips == 0)
 	{
