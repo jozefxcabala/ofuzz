@@ -132,7 +132,7 @@ void CodeCoverage::runInstrumentedBinaryFile()
             LOG_DEBUG(id(), "Run target application with %s, num of arguments is %d", inputFile().c_str(), argc());
             if(argc() == 3)
             {
-                if(execl("./a.out", "./a.out", inputFile().c_str(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
+                if(execl("./a.out", "./a.out", inputFile().c_str(), (char*) NULL) == -1)
                 {
                     LOG_ERROR(id(), "Error in execl(""./a.out"", ""./a.out"", inputFile(), (char*) NULL) occurred: %s", std::strerror(errno));
                     exit(EXIT_FAILURE);
@@ -140,7 +140,7 @@ void CodeCoverage::runInstrumentedBinaryFile()
             }
             else if(argc() == 4)
             {
-                if(execl("./a.out", "./a.out", argv()[3], inputFile().c_str(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
+                if(execl("./a.out", "./a.out", argv()[3], inputFile().c_str(), (char*) NULL) == -1)
                 {
                     LOG_ERROR(id(), "Error in execl(""./a.out"", ""./a.out"", argv()[3], inputFile(), (char*) NULL) occurred: %s", std::strerror(errno));
                     exit(EXIT_FAILURE);

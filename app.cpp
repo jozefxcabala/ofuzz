@@ -55,7 +55,5 @@ int main(int argc, char** argv)
 
     fuzzer.start(argv[2]);
 
-    //TODO asi to sprav tak aby si to priecinok vytvorilo samo pri crash_file a mutated_file
-
     return 0;
 }

@@ -173,10 +173,9 @@ bool CrashesProcessing::checkForCrash(std::string data){
             LOG_ERROR(id(), "Not supported number of arguments");
             exit(EXIT_FAILURE);
         }
-        //execvp(file, arg);
-        // shouldn't return, if it does, we have an error with the command
+
         LOG_ERROR(id(), "[!] Unknown command for execvp, exiting...\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     else {
         // this is run by the parent process

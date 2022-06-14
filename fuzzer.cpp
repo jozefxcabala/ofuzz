@@ -70,7 +70,6 @@ void Fuzzer::fuzzing(int id, std::string target, std::chrono::time_point<std::ch
     int counter = 0;
 
     while(true){
-        //todo create some GUI, tu sa bude volat nejaka funkcia, ktora bude zobrazovat data o aplikacii + dole sa bude vypisovat ak vznikne nejaky crash
         menu(5, target, start);
         ITERATION.store(ITERATION.load() + 1);
         std::string previousData;
@@ -100,7 +99,7 @@ void Fuzzer::fuzzing(int id, std::string target, std::chrono::time_point<std::ch
         std::string newData = sample.mutation().start(0, previousData);
 
         LOG_DEBUG(id, "Thread %d is trying to create rewrite data in orignal file", id);
-        sample.sampleProcessing().createNew(newData, sample.fileName(), sample.mutation().dirForMutations()); //TODO dopln thread do debugov a filenames
+        sample.sampleProcessing().createNew(newData, sample.fileName(), sample.mutation().dirForMutations());
 
         LOG_DEBUG(id, "Thread %d is trying to calculate new code coverage", id);
         mutex.lock();

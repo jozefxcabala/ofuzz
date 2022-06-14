@@ -123,4 +123,4 @@ class Logger
 
 #endif // LOGGER_H
 
-// zdroj: https://github.com/danielblagy/Yelloger/tree/master/src
+// source: https://github.com/danielblagy/Yelloger/tree/master/src
