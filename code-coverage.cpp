@@ -122,6 +122,12 @@ void CodeCoverage::runInstrumentedBinaryFile()
         }
         case 0:
         {
+            int fd = open("/dev/null", O_WRONLY);
+
+            // dup both stdout and stderr and send them to /dev/null
+            dup2(fd, 1);
+            dup2(fd, 2);
+            close(fd);
 
             LOG_DEBUG(id(), "Run target application with %s, num of arguments is %d", inputFile().c_str(), argc());
             if(argc() == 3)
