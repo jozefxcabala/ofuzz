@@ -14,6 +14,8 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <chrono>
+#include <sstream>
 #include "logger.hpp"
 
 void CrashesProcessing::setId(int id)
@@ -85,11 +87,13 @@ void CrashesProcessing::createNew(std::string data, std::string fileName)
 	LOG_INFO(id(), "Crash was created successfully");
 }
 
-void CrashesProcessing::start(std::string data)
+bool CrashesProcessing::start(std::string data)
 {
 	LOG_INFO(id(), "Start of crash processing");
-	checkForCrash(data);
+	bool status = checkForCrash(data);
 	LOG_INFO(id(), "Crash processing ended successfully");
+
+    return status;
 }
 
 void CrashesProcessing::setArgv(char** argv)
@@ -122,7 +126,7 @@ int CrashesProcessing::argc()
     return argc_;
 }
 
-void CrashesProcessing::checkForCrash(std::string data){
+bool CrashesProcessing::checkForCrash(std::string data){
 	std::string targetApplication(argv()[2]);
 
 	LOG_INFO(id(), "Start of checking for crash from target application: %s", targetApplication.c_str());
@@ -133,6 +137,7 @@ void CrashesProcessing::checkForCrash(std::string data){
     
 	pid_t child_pid;
     int child_status;
+    int status = false;
 
     child_pid = fork();
     if (child_pid == 0) {
@@ -183,18 +188,15 @@ void CrashesProcessing::checkForCrash(std::string data){
                 perror("waitpid");
             }
             if (WIFEXITED(child_status)) {
-                //LOG_DEBUG("WIFEXITED: Exit Status: %d\n", WEXITSTATUS(child_status));
+                LOG_DEBUG(id(), "App %s exited successfully", targetApplication.c_str());
             } else if (WIFSIGNALED(child_status)) {
-                //crashes++;
                 int exit_status = WTERMSIG(child_status);
-                //LOG_DEBUG("\r[>] Crashes: %d", crashes);
                 fflush(stdout);
-                char command[50];
-                sprintf(command, "cp mutated.jpeg ccrashes/%d.%d", id(), 
-                exit_status);
-                //system(command);
 				std::string suffix = inputFile().substr(inputFile().find("/") + 1);
-				createNew(data, "exit-status-" + std::to_string(exit_status) + "-" + getDate() + "-" + suffix);
+                std::string crashName = "exit-status-" + std::to_string(exit_status) + "-" + getDate() + "-" + suffix;
+                LOG_APP(id(), "%s was created", crashName.c_str());
+				createNew(data, crashName);
+                status = true;
             } else if (WIFSTOPPED(child_status)) {
                 LOG_DEBUG(id(), "WIFSTOPPED: Exit Status: %d\n", WSTOPSIG(child_status));
             } else if (WIFCONTINUED(child_status)) {
@@ -204,4 +206,6 @@ void CrashesProcessing::checkForCrash(std::string data){
     }
 
 	LOG_INFO(id(), "Checking for crash from target application: %s ended successfully", targetApplication.c_str());
+
+    return status;
 }

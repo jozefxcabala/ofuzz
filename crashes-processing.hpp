@@ -29,11 +29,11 @@ class CrashesProcessing
         std::string dirForCrashFiles();
         int id();
 
-        void start(std::string data);
+        bool start(std::string data);
 
     private:
         std::string getDate();
-        void checkForCrash(std::string data);
+        bool checkForCrash(std::string data);
 };
 
 #endif // CRASHES_PROCESSING_H
