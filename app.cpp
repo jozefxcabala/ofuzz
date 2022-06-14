@@ -4,6 +4,7 @@
 #include "iostream"
 #include "logger.hpp"
 #include "assert.h"
+#include <sys/stat.h>
 
 void checkParameters(int argc, char** argv)
 {
@@ -18,7 +19,30 @@ void checkParameters(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
+    
     LOG_INFO(6, "App was started!");
+    LOG_DEBUG(6, "Removing of old myfifo");
+
+    struct stat info;
+
+    if(stat("myfifo", &info) == 0)
+    {
+        int status = system("rm myfifo");
+        
+        if(status != 0)
+        {
+            LOG_ERROR(6, "Removing of old myfifo ended unsuccessfully");
+            exit(EXIT_FAILURE);
+        }
+
+        LOG_DEBUG(6, "Removing of old myfifo ended successfully");
+    } else
+    {
+        LOG_DEBUG(6, "There is no file myfifo");
+    }
+
+    
+
     checkParameters(argc, argv);
 
     CorpusInit corpusInit(argv, 5, argc);
