@@ -129,30 +129,30 @@ void CrashesProcessing::checkForCrash(std::string data){
 
 	LOG_DEBUG(id(), "Start of build cmd for run target application: %s", targetApplication.c_str());
 
-    char* file = const_cast<char*>((std::string("./") + std::string(argv()[2])).c_str());
-    char* arg[4];
+    const char* file = (std::string("./") + std::string(argv()[2])).c_str();
+    // char* arg[4];
 
-	if(argc() == 4)
-	{
-		arg[0] = file;
-		arg[1] = const_cast<char*>(inputFile().c_str());
-		arg[2] = argv()[3];
-		arg[3] = NULL;
-	} 
-	else if (argc() == 3) 
-	{
-		arg[0] = file;
-		arg[1] = const_cast<char*>(inputFile().c_str());
-		arg[2] = NULL;
-		arg[3] = NULL;
-	} 
-	else
-	{
-		LOG_ERROR(id(), "Not supported number of arguments");
-        exit(EXIT_FAILURE);
-	}
+	// if(argc() == 4)
+	// {
+	// 	arg[0] = file;
+	// 	arg[1] = inputFile().c_str();
+	// 	arg[2] = argv()[3];
+	// 	arg[3] = NULL;
+	// } 
+	// else if (argc() == 3) 
+	// {
+	// 	arg[0] = file;
+	// 	arg[1] = inputFile().c_str();
+	// 	arg[2] = NULL;
+	// 	arg[3] = NULL;
+	// } 
+	// else
+	// {
+	// 	LOG_ERROR(id(), "Not supported number of arguments");
+    //     exit(EXIT_FAILURE);
+	// }
 
-	LOG_DEBUG(id(), "Build of cmd for run target application: %s, ended successfully.", targetApplication.c_str());
+	// LOG_DEBUG(id(), "Build of cmd for run target application: %s, ended successfully.", targetApplication.c_str());
     
 	
 	pid_t child_pid;
@@ -170,7 +170,29 @@ void CrashesProcessing::checkForCrash(std::string data){
         close(fd);
         
 
-        execvp(file, arg);
+        
+        if(argc() == 3)
+        {
+            if(execl(file, file, inputFile().c_str(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
+            {
+                LOG_ERROR(id(), "Error in execl(""./a.out"", ""./a.out"", inputFile(), (char*) NULL) occurred: %s", std::strerror(errno));
+                exit(EXIT_FAILURE);
+            }
+        }
+        else if(argc() == 4)
+        {
+            if(execl(file, file, argv()[3], inputFile().c_str(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
+            {
+                LOG_ERROR(id(), "Error in execl(""./a.out"", ""./a.out"", argv()[3], inputFile(), (char*) NULL) occurred: %s", std::strerror(errno));
+                exit(EXIT_FAILURE);
+            }
+        }
+        else
+        {
+            LOG_ERROR(id(), "Not supported number of arguments");
+            exit(EXIT_FAILURE);
+        }
+        //execvp(file, arg);
         // shouldn't return, if it does, we have an error with the command
         LOG_ERROR(id(), "[!] Unknown command for execvp, exiting...\n");
         exit(1);
