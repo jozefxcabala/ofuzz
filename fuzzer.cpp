@@ -36,22 +36,27 @@ void Fuzzer::fuzzing(int id)
     Sample sample = corpus().at(id);
     mutex.unlock();
 
+    int counter = 0;
+
     while(true){
         //todo create some GUI, tu sa bude volat nejaka funkcia, ktora bude zobrazovat data o aplikacii + dole sa bude vypisovat ak vznikne nejaky crash
         system("clear");
         ITERATION.store(ITERATION.load() + 1);
         LOG_APP(6, "Iteration: %d", ITERATION.load());
+        LOG_APP(6, "BestCoverage is %d", BEST_COVERAGE.load());
         std::string previousData;
         LOG_DEBUG(id, "Thread %d is trying to get data with best coverage", id);
         mutex.lock();
 
-        if(firstIteration)
+        if(firstIteration || counter < 50)
         {
             previousData = sample.sampleProcessing().getBytes(sample.fileName(), sample.mutation().dirForMutations());
             firstIteration = false;
+            counter++;
         } else
         {
             previousData = sample.sampleProcessing().getBytes("best-coverage", sample.mutation().dirForMutations());
+            counter = 0;
         }
         
         mutex.unlock();

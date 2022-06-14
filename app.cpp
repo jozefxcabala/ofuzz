@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 
     checkParameters(argc, argv);
 
-    CorpusInit corpusInit(argv, 39, argc);
+    CorpusInit corpusInit(argv, 10, argc);
     BinaryFileInstrumentation binaryFileInstrumentation(argv[2]);
 
     std::vector<Sample> corpus = corpusInit.start();
