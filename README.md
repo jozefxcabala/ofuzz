@@ -9,8 +9,8 @@ Mutation-based|covarge-based fuzzer, ktorý dokáže testovať aplikácie bez zn
 # Spustenie
 
 1. naklonuj repozitár pomocou git clone
-2. v priečinku spusti príkaz ```shell $ make```
-3. spusti ```shell $ ./app.out "dir for input samples" "target application" "param" ```
+2. v priečinku spusti príkaz ```$ make```
+3. spusti ```$ ./app.out "dir for input samples" "target application" "param" ```
 
  * maximalne jeden parameter
 
