@@ -1,6 +1,6 @@
 # ofuzz
 
-Fuzzer s názvom OFUZZ bol vyvinutý Jozefom Čabalom v rámci bakalárskej práce s názvom "Vyhľadávanie zraniteľností pomocou fuzzing techník"
+Fuzzer s názvom ```ofuzz``` bol vyvinutý Jozefom Čabalom v rámci bakalárskej práce s názvom "Vyhľadávanie zraniteľností pomocou fuzzing techník"
 
 # Popis
 
