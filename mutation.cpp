@@ -47,7 +47,7 @@ std::string Mutation::bitFlip(std::string data)
 {
 	LOG_INFO(id(), "Start of bitFlip method of mutation");
 	int size = (data.length());
-	int numOfFlips = (int)(size * .05);
+	int numOfFlips = (int)(size * .15);
 
 	if(numOfFlips == 0)
 	{
@@ -150,7 +150,7 @@ int Mutation::pick()
 	return result;
 }
 
-std::string Mutation::start(int method, std::string data)
+std::string Mutation::start(int method, std::string data, std::atomic<int>& MAGIC_NUMBERS, std::atomic<int>& BIT_FLIP)
 {
 	srand ( time(NULL) );
 	LOG_INFO(id(), "Start of mutation");
@@ -177,11 +177,13 @@ std::string Mutation::start(int method, std::string data)
     {
         // utilize the magic mutation method;
         mutated = magic(data, magicVector());
+		MAGIC_NUMBERS.store(MAGIC_NUMBERS.load() + 1);
     }
     else
     {
         // utilize the bit flip mutation;
         mutated = bitFlip(data);
+		BIT_FLIP.store(BIT_FLIP.load() + 1);
     }
 
 	LOG_INFO(id(), "Mutation ended successfully");

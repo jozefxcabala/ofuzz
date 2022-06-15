@@ -13,6 +13,8 @@
 static std::atomic<int> BEST_COVERAGE;
 static std::atomic<int> ITERATION;
 static std::atomic<int> CRASHES;
+static std::atomic<int> BIT_FLIP;
+static std::atomic<int> MAGIC_NUMBERS;
 static std::mutex mutex;
 
 class Fuzzer 

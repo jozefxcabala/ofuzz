@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <atomic>
 
 #ifndef MUTATION_H
 #define MUTATION_H
@@ -14,7 +15,7 @@ class Mutation
         Mutation();
         Mutation(std::string dirForMutationsA, int id);
 
-        std::string start(int method, std::string data);
+        std::string start(int method, std::string data, std::atomic<int>& MAGIC_NUMBERS, std::atomic<int>& BIT_FLIP);
         
         std::vector<std::string> magicVector();
         std::string dirForMutations();

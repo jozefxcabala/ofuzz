@@ -23,14 +23,14 @@ void menu(int size, std::string target, std::chrono::time_point<std::chrono::hig
         int seconds = durationInSeconds.count();
 
         printf(
-        ".........................[ %03d days %02d hours %02d minutes %02d seconds ]........................\nIterations  : %d\nSpeed       : %d/sec\nCrashes     : %d\nCorpus Size : %d\nCoverage    : %d\nTarget      : %s\n............................................................................................\n",
-        day % 365, hour % 24, minutes % 60, seconds % 60, ITERATION.load(), (int)(iteration / durationInSeconds.count()), CRASHES.load(), size, BEST_COVERAGE.load(), target.c_str());
+        ".........................[ %03d days %02d hours %02d minutes %02d seconds ]........................\nIterations  : %d\nSpeed       : %d/sec\nCrashes     : %d\nCorpus Size : %d\nCoverage    : %d\nTarget      : %s\nBitFlip Mutation    : %dx\nMagic Mutation    : %dx\n............................................................................................\n",
+        day % 365, hour % 24, minutes % 60, seconds % 60, ITERATION.load(), (int)(iteration / durationInSeconds.count()), CRASHES.load(), size, BEST_COVERAGE.load(), target.c_str(), BIT_FLIP.load(), MAGIC_NUMBERS.load());
 
     } else
     {
         printf(
-        ".........................[ %03d days %02d hours %02d minutes %02d seconds ]........................\nIterations  : %d\nSpeed       : %d/sec\nCrashes     : %d\nCorpus Size : %d\nCoverage    : %d\nTarget      : %s\n............................................................................................\n",
-        0, 0, 0, 0, ITERATION.load(), 0, CRASHES.load(), size, BEST_COVERAGE.load(), target.c_str());
+        ".........................[ %03d days %02d hours %02d minutes %02d seconds ]........................\nIterations  : %d\nSpeed       : %d/sec\nCrashes     : %d\nCorpus Size : %d\nCoverage    : %d\nTarget      : %s\nBitFlip Mutation    : %dx\nMagic Mutation    : %dx\n............................................................................................\n",
+        0, 0, 0, 0, ITERATION.load(), 0, CRASHES.load(), size, BEST_COVERAGE.load(), target.c_str(), BIT_FLIP.load(), MAGIC_NUMBERS.load());
     }
         
 
@@ -76,7 +76,7 @@ void Fuzzer::fuzzing(int id, std::string target, std::chrono::time_point<std::ch
         LOG_DEBUG(id, "Thread %d is trying to get data with best coverage", id);
         mutex.lock();
 
-        if(firstIteration || counter < 100)
+        if(firstIteration || counter < 75)
         {
             previousData = sample.sampleProcessing().getBytes(sample.fileName(), sample.mutation().dirForMutations());
             firstIteration = false;
@@ -96,7 +96,7 @@ void Fuzzer::fuzzing(int id, std::string target, std::chrono::time_point<std::ch
         LOG_DEBUG(id, "Thread %d previous coverage is: %d", id, previousCoverage);
 
         LOG_DEBUG(id, "Thread %d is trying to mutate data", id);
-        std::string newData = sample.mutation().start(0, previousData);
+        std::string newData = sample.mutation().start(2, previousData, MAGIC_NUMBERS, BIT_FLIP);
 
         LOG_DEBUG(id, "Thread %d is trying to create rewrite data in orignal file", id);
         sample.sampleProcessing().createNew(newData, sample.fileName(), sample.mutation().dirForMutations());
@@ -152,6 +152,12 @@ void Fuzzer::start(std::string target)
 
     LOG_DEBUG(6, "CRASHES is setting to 0");
     CRASHES.store(0);
+
+    LOG_DEBUG(6, "BIT_FLIP is setting to 0");
+    BIT_FLIP.store(0);
+
+    LOG_DEBUG(6, "MAGIC_NUMBERS is setting to 0");
+    MAGIC_NUMBERS.store(0);
 
     std::thread threads[corpus().size()];
 
