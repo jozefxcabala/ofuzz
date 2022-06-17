@@ -76,15 +76,24 @@ void Fuzzer::fuzzing(int id, std::string target, std::chrono::time_point<std::ch
         LOG_DEBUG(id, "Thread %d is trying to get data with best coverage", id);
         mutex.lock();
 
-        if(firstIteration || counter < 75)
+        if(firstIteration || counter < 50)
         {
             previousData = sample.sampleProcessing().getBytes(sample.fileName(), sample.mutation().dirForMutations());
             firstIteration = false;
             counter++;
         } else
         {
-            previousData = sample.sampleProcessing().getBytes("best-coverage", sample.mutation().dirForMutations());
+            
+            if((BEST_SAMPLES.load() % corpus().size()) < 4)
+            {
+                previousData = sample.sampleProcessing().getBytes("best-coverage", sample.mutation().dirForMutations());
+            } else
+            {
+                previousData = CLEAN_INPUT;
+            }
+
             counter = 0;
+            BEST_SAMPLES.store(BEST_SAMPLES.load() + 1);
         }
         
         mutex.unlock();
@@ -96,7 +105,7 @@ void Fuzzer::fuzzing(int id, std::string target, std::chrono::time_point<std::ch
         LOG_DEBUG(id, "Thread %d previous coverage is: %d", id, previousCoverage);
 
         LOG_DEBUG(id, "Thread %d is trying to mutate data", id);
-        std::string newData = sample.mutation().start(2, previousData, MAGIC_NUMBERS, BIT_FLIP);
+        std::string newData = sample.mutation().start(previousData, MAGIC_NUMBERS, BIT_FLIP);
 
         LOG_DEBUG(id, "Thread %d is trying to create rewrite data in orignal file", id);
         sample.sampleProcessing().createNew(newData, sample.fileName(), sample.mutation().dirForMutations());
@@ -158,6 +167,13 @@ void Fuzzer::start(std::string target)
 
     LOG_DEBUG(6, "MAGIC_NUMBERS is setting to 0");
     MAGIC_NUMBERS.store(0);
+
+    SampleProcessing sampleProcessing(6);
+    LOG_DEBUG(6, "CLEAN_INPUT is setting to some data");
+    CLEAN_INPUT = sampleProcessing.getBytes("best-coverage", corpus().at(0).mutation().dirForMutations());
+
+    LOG_DEBUG(6, "BEST_SAMPLES is setting to 0");
+    BEST_SAMPLES.store(0);
 
     std::thread threads[corpus().size()];
 

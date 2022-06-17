@@ -47,7 +47,7 @@ std::string Mutation::bitFlip(std::string data)
 {
 	LOG_INFO(id(), "Start of bitFlip method of mutation");
 	int size = (data.length());
-	int numOfFlips = (int)(size * .15);
+	int numOfFlips = (int)(size * .10);
 
 	if(numOfFlips == 0)
 	{
@@ -144,13 +144,13 @@ std::string Mutation::magic(std::string data, std::vector<std::string> magic)
 int Mutation::pick()
 {
 	LOG_INFO(id(), "Start of pick mutation method");
-	int result = rand() % 2;
+	int result = rand() % 10;
 	LOG_INFO(id(), "%d method was picked successfully", result);
 
 	return result;
 }
 
-std::string Mutation::start(int method, std::string data, std::atomic<int>& MAGIC_NUMBERS, std::atomic<int>& BIT_FLIP)
+std::string Mutation::start(std::string data, std::atomic<int>& MAGIC_NUMBERS, std::atomic<int>& BIT_FLIP)
 {
 	srand ( time(NULL) );
 	LOG_INFO(id(), "Start of mutation");
@@ -163,17 +163,10 @@ std::string Mutation::start(int method, std::string data, std::atomic<int>& MAGI
     }
 
 
-    if (method == 0 || method == 1)
-    {
-        function = method;
-    }
-    else
-    {
-        function = pick();
-    }
-    
+    function = pick();
 
-    if (function == 0)
+
+    if (function > 3)
     {
         // utilize the magic mutation method;
         mutated = magic(data, magicVector());

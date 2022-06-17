@@ -131,10 +131,7 @@ bool CrashesProcessing::checkForCrash(std::string data){
 
 	LOG_INFO(id(), "Start of checking for crash from target application: %s", targetApplication.c_str());
 
-	LOG_DEBUG(id(), "Start of build cmd for run target application: %s", targetApplication.c_str());
-
-    const char* file = (std::string("./") + std::string(argv()[2])).c_str();
-    
+    std::string file = std::string("./") + std::string(argv()[2]);
 	pid_t child_pid;
     int child_status;
     int status = false;
@@ -151,10 +148,10 @@ bool CrashesProcessing::checkForCrash(std::string data){
         close(fd);
         
 
-        
+        LOG_INFO(id(), "Running application for finding crash");
         if(argc() == 3)
         {
-            if(execl(file, file, inputFile().c_str(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
+            if(execl(file.c_str(), file.c_str(), inputFile().c_str(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
             {
                 LOG_ERROR(id(), "Error in execl(""./a.out"", ""./a.out"", inputFile(), (char*) NULL) occurred: %s", std::strerror(errno));
                 exit(EXIT_FAILURE);
@@ -162,10 +159,10 @@ bool CrashesProcessing::checkForCrash(std::string data){
         }
         else if(argc() == 4)
         {
-            if(execl(file, file, argv()[3], inputFile().c_str(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
+            if(execl(file.c_str(), file.c_str(), argv()[3], inputFile().c_str(), (char*) NULL) == -1) // TODO zmen inputFile aby sa dal poslat argumentom
             {
                 LOG_ERROR(id(), "Error in execl(""./a.out"", ""./a.out"", argv()[3], inputFile(), (char*) NULL) occurred: %s", std::strerror(errno));
-                exit(EXIT_FAILURE);
+                exit(EXIT_FAILURE); 
             }
         }
         else

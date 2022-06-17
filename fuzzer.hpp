@@ -15,6 +15,8 @@ static std::atomic<int> ITERATION;
 static std::atomic<int> CRASHES;
 static std::atomic<int> BIT_FLIP;
 static std::atomic<int> MAGIC_NUMBERS;
+static std::atomic<int> BEST_SAMPLES;
+static std::string CLEAN_INPUT;
 static std::mutex mutex;
 
 class Fuzzer 

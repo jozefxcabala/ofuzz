@@ -43,9 +43,9 @@ void BinaryFileInstrumentation::runE9PatchTool()
         }
         case 0:
         {
-            //sm=/j.*/ or asm=/cmp.*/ or asm=/ret.*/ or asm=/push.*/
+            //asm=/j.*/ or asm=/cmp.*/ or asm=/ret.*/ or asm=/push.*/
             LOG_INFO(6, "Start of instrumentation");
-            if(execl("./e9patch/e9tool", "./e9patch/e9tool", "-M", "asm=/j.*/ or asm=/cmp.*/ or asm=/ret.*/ or asm=/push.*/", "-P", "entry(addr)@instrumentation.out", targetApplication().c_str(), (char*) NULL) == -1)
+            if(execl("./e9patch/e9tool", "./e9patch/e9tool", "-M", "asm=/j.*/", "-P", "entry(addr)@instrumentation.out", targetApplication().c_str(), (char*) NULL) == -1)
             {
                 LOG_ERROR(6, "The following ""./e9patch/e9tool"", ""./e9patch/e9tool"", ""-M"", ""asm=/j.*/"", ""-P"", ""entry(addr)@instrumentation.out"", ""%s"", (char*) NULL) error occurred", targetApplication().c_str());
                 exit(EXIT_FAILURE);
